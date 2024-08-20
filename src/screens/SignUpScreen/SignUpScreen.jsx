@@ -2,15 +2,15 @@ import {
   StyleSheet,
   Text,
   View,
-  Button,
   Pressable,
   Alert,
   Image,
+  ScrollView,
 } from 'react-native';
-import React, {useRef, useState} from 'react';
+import React, { useRef, useState } from 'react';
 
 // Helpers
-import {hp, wp} from '../../helpers/common';
+import { hp, wp } from '../../helpers/common';
 import colors from '../../constants/colors';
 
 // Components
@@ -19,18 +19,20 @@ import Input from '../../components/Input/Input';
 import BackButton from '../../components/BackButton/BackButton';
 import HugeIcon from '../../assets/icons';
 import weight from '../../constants/weight';
-import ActionButton from '../../components/ActionButton/ActionButton';
+import ActionButton from '../../components/ActionButton/ActionButton'; 
 
-const LoginScreen = ({navigation}) => {
+const SignUpScreen = ({ navigation }) => {
+  const nameRef = useRef('');
   const emailRef = useRef('');
   const passwordRef = useRef('');
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async () => {
-    if (!emailRef.current || !passwordRef.current) {
-      Alert.alert('Login', 'Please fill all the fields');
+    if (!nameRef.current || !emailRef.current || !passwordRef.current) {
+      Alert.alert('Sign up', 'Please fill all the fields');
       return;
     }
+    // Handle sign-up logic
   };
 
   return (
@@ -47,13 +49,18 @@ const LoginScreen = ({navigation}) => {
         </View>
         {/* Welcome */}
         <View>
-          <Text style={[styles.welcomeText]}>Hey,</Text>
-          <Text style={[styles.welcomeText, {color: colors.primary}]}>
-            Welcome Back!
+          <Text style={styles.welcomeText}>Let's</Text>
+          <Text style={[styles.welcomeText, { color: colors.primary }]}>
+            Get Started!
           </Text>
         </View>
         {/* Form */}
         <View style={styles.form}>
+          <Input
+            icon={<HugeIcon name="user" size={26} strokeWidth={1.6} />}
+            placeholder="Enter your name"
+            onChangeText={value => (nameRef.current = value)}
+          />
           <Input
             icon={<HugeIcon name="mail" size={26} strokeWidth={1.6} />}
             placeholder="Enter your email"
@@ -65,35 +72,36 @@ const LoginScreen = ({navigation}) => {
             secureTextEntry
             onChangeText={value => (passwordRef.current = value)}
           />
-          <View style={styles.socialDiv}>
-            <ActionButton onPress={onSubmit} buttonText="Sign In" />
-            <Text style={{color: colors.primaryDark}}>or</Text>
-            <ActionButton
-              onPress={() => {}}
-              buttonText="Continue with Google"
-              backgroundColor="transparent"
-              textColor={colors.roseLight}
-            />
-            <ActionButton
-              onPress={() => {}}
-              buttonText="Continue with Facebook"
-              backgroundColor="transparent"
-              textColor={colors.roseLight}
-            />
-          </View>
+          <ActionButton
+            onPress={onSubmit}
+            buttonText="Sign Up"
+          />
+          {/* <Text style={{ color: colors.primaryDark }}>or</Text> */}
+          <ActionButton
+            onPress={() => {}}
+            buttonText="Continue with Google"
+            backgroundColor="transparent"
+            textColor={colors.roseLight}
+          />
+          <ActionButton
+            onPress={() => {}}
+            buttonText="Continue with Facebook"
+            backgroundColor="transparent"
+            textColor={colors.roseLight}
+          />
         </View>
 
-        {/* footer */}
+        {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Don't have an account?</Text>
+          <Text style={styles.footerText}>Already have an account?</Text>
           <Pressable>
             <Text
               style={[
                 styles.footerText,
-                {color: colors.primaryDark, fontWeight: weight.semibold},
+                { color: colors.primaryDark, fontWeight: weight.semibold },
               ]}
-              onPress={() => navigation.replace('SignUpScreen')}>
-              Sign up
+              onPress={() => navigation.replace('LoginScreen')}>
+              Login
             </Text>
           </Pressable>
         </View>
@@ -108,7 +116,7 @@ const LoginScreen = ({navigation}) => {
   );
 };
 
-export default LoginScreen;
+export default SignUpScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -142,18 +150,6 @@ const styles = StyleSheet.create({
   },
   form: {
     gap: 25,
-  },
-  forgotPassword: {
-    textAlign: 'right',
-    fontWeight: weight.semibold,
-    color: colors.text,
-  },
-  socialDiv: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 15,
   },
   footer: {
     flexDirection: 'row',
