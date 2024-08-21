@@ -106,7 +106,7 @@ const SignUpScreen = ({ navigation }) => {
           </Pressable>
         </View>
         <ActionButton
-          onPress={() => navigation.navigate('DashboardScreen')}
+          onPress={() => navigation.navigate('Dashboard')}
           buttonText="Go to Dashboard"
           backgroundColor="transparent"
           textColor={colors.roseLight}

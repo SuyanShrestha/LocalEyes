@@ -1,7 +1,6 @@
-import {ScrollView, StyleSheet, Text, View, Image} from 'react-native';
-import React, { useRef } from 'react';
+import {ScrollView, StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
+import React, {useRef} from 'react';
 import globalStyles from '../../styles/globalStyles';
-import ScreenWrapper from '../../components/ScreenWrapper/ScreenWrapper';
 import Input from '../../components/Input/Input';
 import HugeIcon from '../../assets/icons';
 import {hp, wp} from '../../helpers/common';
@@ -9,8 +8,9 @@ import colors from '../../constants/colors';
 import weight from '../../constants/weight';
 import radius from '../../constants/radius';
 
-const HomeScreen = () => {
-  const searchRef = useRef("");
+const HomeScreen = ({navigation}) => {
+  const searchRef = useRef('');
+
   return (
     <ScrollView contentContainerStyle={[globalStyles.container]}>
       {/* first container */}
@@ -24,6 +24,13 @@ const HomeScreen = () => {
           </View>
           <Text style={styles.nameTitle}>Suyan Shrestha</Text>
         </View>
+
+        {/* hamburger */}
+        <TouchableOpacity
+          onPress={() => navigation.openDrawer()}
+          style={styles.hamburgerMenu}>
+          <HugeIcon name="menu" size={26} color={colors.text} />
+        </TouchableOpacity>
       </View>
 
       {/* second container */}
@@ -42,6 +49,7 @@ const HomeScreen = () => {
 };
 
 export default HomeScreen;
+
 
 const styles = StyleSheet.create({
   firstContainer: {
@@ -77,6 +85,11 @@ const styles = StyleSheet.create({
     fontWeight: weight.bold,
     color: colors.text,
     width: wp(50),
+  },
+  hamburgerMenu: {
+    padding: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.07)',
+    borderRadius: 50,
   },
   secondContainer: {
     backgroundColor: colors.secondaryColor30,

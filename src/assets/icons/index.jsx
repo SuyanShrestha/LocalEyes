@@ -10,6 +10,7 @@ import UserIcon from './UserIcon';
 import UserSearch01Icon from './UserSearch01Icon';
 import NoteIcon from './NoteIcon';
 import Notification02Icon from './Notification02Icon';
+import Menu11Icon from './Menu11Icon';
 
 const icons = {
   home: Home01Icon,
@@ -20,6 +21,7 @@ const icons = {
   userSearch: UserSearch01Icon,
   note: NoteIcon,
   notification: Notification02Icon,
+  menu: Menu11Icon,
 };
 
 const HugeIcon = ({name, ...props}) => {

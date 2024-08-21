@@ -6,6 +6,7 @@ import OrdersScreen from '../OrdersScreen/OrdersScreen';
 import NotificationsScreen from '../NotificationsScreen/NotificationsScreen';
 import HugeIcon from '../../assets/icons';
 import colors from '../../constants/colors';
+import HomeDrawerNavigator from '../../navigation/HomeDrawerNavigator';
 
 const DashboardScreen = () => {
   const Tab = createBottomTabNavigator();
@@ -17,7 +18,7 @@ const DashboardScreen = () => {
         tabBarIcon: ({focused, color, size}) => {
           let iconName;
 
-          if (route.name === 'Home') {
+          if (route.name === 'HomeDrawer') {
             iconName = 'home';
           } else if (route.name === 'Orders') {
             iconName = 'note';
@@ -36,7 +37,7 @@ const DashboardScreen = () => {
         tabBarActiveTintColor: colors.primary, 
         tabBarInactiveTintColor: 'gray', 
       })}>
-      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="HomeDrawer" component={HomeDrawerNavigator} />
       <Tab.Screen name="Orders" component={OrdersScreen} />
       <Tab.Screen name="Notifications" component={NotificationsScreen} />
     </Tab.Navigator>
@@ -46,3 +47,4 @@ const DashboardScreen = () => {
 export default DashboardScreen;
 
 const styles = StyleSheet.create({});
+ 
