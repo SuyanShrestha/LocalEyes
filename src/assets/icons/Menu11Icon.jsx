@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Svg, {Path} from 'react-native-svg';
+import colors from '../../constants/colors';
 
 const Menu11Icon = props => (
   <Svg
@@ -12,21 +13,24 @@ const Menu11Icon = props => (
     {...props}>
     <Path
       d="M20 12L10 12"
-      stroke="currentColor"
+      // stroke="currentColor"
+      stroke={colors.secondaryColor30}
       strokeWidth={props.strokeWidth}
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <Path
       d="M20 5L4 5"
-      stroke="currentColor"
+      // stroke="currentColor"
+      stroke={colors.secondaryColor30}
       strokeWidth={props.strokeWidth}
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <Path
       d="M20 19L4 19"
-      stroke="currentColor"
+      // stroke="currentColor"
+      stroke={colors.secondaryColor30}
       strokeWidth={props.strokeWidth}
       strokeLinecap="round"
       strokeLinejoin="round"

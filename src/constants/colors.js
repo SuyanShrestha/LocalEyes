@@ -12,6 +12,7 @@ const colors = {
   rose: '#EF4444',
   roseLight: '#F87171',
 
+  primaryColor60: '#f3f5fd',
   secondaryColor30: '#FAF9F6',
   actionButtonColor10: '#009B58'
 

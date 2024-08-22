@@ -7,10 +7,11 @@ import {
   Image,
   ScrollView,
 } from 'react-native';
-import React, { useRef, useState } from 'react';
+import React, {useRef, useState, useContext} from 'react';
+import {AuthContext} from '../../navigation/AuthProvider';
 
 // Helpers
-import { hp, wp } from '../../helpers/common';
+import {hp, wp} from '../../helpers/common';
 import colors from '../../constants/colors';
 
 // Components
@@ -19,20 +20,29 @@ import Input from '../../components/Input/Input';
 import BackButton from '../../components/BackButton/BackButton';
 import HugeIcon from '../../assets/icons';
 import weight from '../../constants/weight';
-import ActionButton from '../../components/ActionButton/ActionButton'; 
+import ActionButton from '../../components/ActionButton/ActionButton';
 
-const SignUpScreen = ({ navigation }) => {
+const SignUpScreen = ({navigation}) => {
   const nameRef = useRef('');
   const emailRef = useRef('');
   const passwordRef = useRef('');
   const [loading, setLoading] = useState(false);
+
+  // const {register} = useContext(AuthContext);
 
   const onSubmit = async () => {
     if (!nameRef.current || !emailRef.current || !passwordRef.current) {
       Alert.alert('Sign up', 'Please fill all the fields');
       return;
     }
-    // Handle sign-up logic
+    // setLoading(true); 
+    // try {
+    //   await register(emailRef.current, passwordRef.current, nameRef.current);
+    // } catch (error) {
+    //   Alert.alert('Sign up', 'Failed to sign up');
+    // } finally {
+    //   setLoading(false); 
+    // }
   };
 
   return (
@@ -50,7 +60,7 @@ const SignUpScreen = ({ navigation }) => {
         {/* Welcome */}
         <View>
           <Text style={styles.welcomeText}>Let's</Text>
-          <Text style={[styles.welcomeText, { color: colors.primary }]}>
+          <Text style={[styles.welcomeText, {color: colors.primary}]}>
             Get Started!
           </Text>
         </View>
@@ -72,10 +82,7 @@ const SignUpScreen = ({ navigation }) => {
             secureTextEntry
             onChangeText={value => (passwordRef.current = value)}
           />
-          <ActionButton
-            onPress={onSubmit}
-            buttonText="Sign Up"
-          />
+          <ActionButton onPress={onSubmit} buttonText="Sign Up" />
           {/* <Text style={{ color: colors.primaryDark }}>or</Text> */}
           <ActionButton
             onPress={() => {}}
@@ -98,7 +105,7 @@ const SignUpScreen = ({ navigation }) => {
             <Text
               style={[
                 styles.footerText,
-                { color: colors.primaryDark, fontWeight: weight.semibold },
+                {color: colors.primaryDark, fontWeight: weight.semibold},
               ]}
               onPress={() => navigation.replace('LoginScreen')}>
               Login

@@ -7,7 +7,7 @@ import {
   Alert,
   Image,
 } from 'react-native';
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, useContext} from 'react';
 
 // Helpers
 import {hp, wp} from '../../helpers/common';
@@ -21,18 +21,32 @@ import HugeIcon from '../../assets/icons';
 import weight from '../../constants/weight';
 import ActionButton from '../../components/ActionButton/ActionButton';
 
+import { AuthContext } from '../../navigation/AuthProvider';
+
+
 const LoginScreen = ({navigation}) => {
   const emailRef = useRef('');
   const passwordRef = useRef('');
   const [loading, setLoading] = useState(false);
+  // const { login } = useContext(AuthContext);
 
   const onSubmit = async () => {
     if (!emailRef.current || !passwordRef.current) {
       Alert.alert('Login', 'Please fill all the fields');
       return;
     }
-  };
 
+    // setLoading(true);
+    // try {
+    //   await login(emailRef.current, passwordRef.current);
+    //   Alert.alert('Login', 'Logged in successfully!');
+    //   navigation.navigate('Dashboard'); 
+    // } catch (error) {
+    //   Alert.alert('Login', error.message);
+    // } finally {
+    //   setLoading(false);
+    // }
+  };
   return (
     <ScreenWrapper bg={colors.white}>
       <View style={styles.container}>

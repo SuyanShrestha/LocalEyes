@@ -1,5 +1,12 @@
-import {ScrollView, StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
-import React, {useRef} from 'react';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
+import React, {useState, useEffect} from 'react';
 import globalStyles from '../../styles/globalStyles';
 import Input from '../../components/Input/Input';
 import HugeIcon from '../../assets/icons';
@@ -7,9 +14,33 @@ import {hp, wp} from '../../helpers/common';
 import colors from '../../constants/colors';
 import weight from '../../constants/weight';
 import radius from '../../constants/radius';
+import CategoryList from '../../components/CategoryList/CategoryList';
+import HamburgerMenu from '../../components/HamburgerMenu/HamburgerMenu';
+import {categories} from '../../constants/categories';
+
+import LottieComponent from '../../components/LottieComponent/LottieComponent';
+import { EmptyLottie, EmptyLottie2 } from '../../assets/lottie';
 
 const HomeScreen = ({navigation}) => {
-  const searchRef = useRef('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredCategories, setFilteredCategories] = useState(categories);
+  const [timeoutId, setTimeoutId] = useState(null);
+
+  // for search using debounce
+  useEffect(() => {
+    if (timeoutId) clearTimeout(timeoutId);
+
+    const newTimeoutId = setTimeout(() => {
+      const filtered = categories.filter(category =>
+        category.name.toLowerCase().includes(searchTerm.toLowerCase()),
+      );
+      setFilteredCategories(filtered);
+    }, 500);
+
+    setTimeoutId(newTimeoutId);
+
+    return () => clearTimeout(newTimeoutId); 
+  }, [searchTerm]);
 
   return (
     <ScrollView contentContainerStyle={[globalStyles.container]}>
@@ -26,22 +57,29 @@ const HomeScreen = ({navigation}) => {
         </View>
 
         {/* hamburger */}
-        <TouchableOpacity
-          onPress={() => navigation.openDrawer()}
-          style={styles.hamburgerMenu}>
-          <HugeIcon name="menu" size={26} color={colors.text} />
-        </TouchableOpacity>
+        <HamburgerMenu navigation={navigation} />
       </View>
 
       {/* second container */}
-      <View style={styles.secondContainer}></View>
+      <View style={styles.secondContainer}>
+        <Text style={styles.sectionTitle}>Services</Text>
+        {filteredCategories.length > 0 ? (
+          <CategoryList categories={filteredCategories} />
+        ) : (
+          <LottieComponent
+            animationData={EmptyLottie2}
+            width={wp(100)}
+            height={wp(100)}
+          />
+        )}
+      </View>
 
       {/* search container */}
       <View style={styles.searchContainer}>
         <Input
           icon={<HugeIcon name="userSearch" size={26} strokeWidth={1.6} />}
           placeholder="Who do you want to hire?"
-          onChangeText={value => (searchRef.current = value)}
+          onChangeText={value => setSearchTerm(value)}
         />
       </View>
     </ScrollView>
@@ -49,7 +87,6 @@ const HomeScreen = ({navigation}) => {
 };
 
 export default HomeScreen;
-
 
 const styles = StyleSheet.create({
   firstContainer: {
@@ -68,7 +105,7 @@ const styles = StyleSheet.create({
     gap: wp(3),
   },
   logoDiv: {
-    backgroundColor: 'rgba(0, 0, 0, 0.07)',
+    backgroundColor: colors.primaryDark,
     padding: 5,
     borderRadius: 50,
   },
@@ -83,19 +120,21 @@ const styles = StyleSheet.create({
   nameTitle: {
     fontSize: hp(4),
     fontWeight: weight.bold,
-    color: colors.text,
+    color: colors.secondaryColor30,
     width: wp(50),
   },
-  hamburgerMenu: {
-    padding: 10,
-    backgroundColor: 'rgba(0, 0, 0, 0.07)',
-    borderRadius: 50,
-  },
   secondContainer: {
-    backgroundColor: colors.secondaryColor30,
-    // height: 200,
+    minHeight: hp(69),
+    paddingTop: hp(5),
+    paddingHorizontal: wp(5),
+    backgroundColor: colors.primaryColor60,
   },
-
+  sectionTitle: {
+    fontSize: hp(3),
+    fontWeight: weight.bold,
+    color: colors.text,
+    marginBottom: hp(3),
+  },
   searchContainer: {
     marginHorizontal: wp(5),
     width: wp(90),
@@ -103,8 +142,6 @@ const styles = StyleSheet.create({
     top: hp(21),
     zIndex: 10,
     backgroundColor: colors.secondaryColor30,
-    // borderWidth: 0.4,
-    // borderColor: colors.text,
     borderRadius: radius.xxl,
     borderCurve: 'continuous',
   },
