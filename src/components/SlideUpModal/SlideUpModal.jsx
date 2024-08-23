@@ -1,80 +1,83 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
-  View,
-  Text,
-  Modal,
-  TouchableOpacity,
   StyleSheet,
+  Text,
+  View,
+  Modal,
   Animated,
-  Dimensions
+  Dimensions,
+  TouchableOpacity,
 } from 'react-native';
-
+import colors from '../../constants/colors';
+import radius from '../../constants/radius';
+import {hp, wp} from '../../helpers/common';
 const { height } = Dimensions.get('window');
 
-const SlideUpModal = () => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const slideAnim = useRef(new Animated.Value(height)).current; // Start at the bottom
+const SlideUpModal = ({ visible, onClose, children, title }) => {
+  const slideAnim = useRef(new Animated.Value(height)).current;
+  const overlayAnim = useRef(new Animated.Value(0)).current;
 
-  const openModal = () => {
-    setModalVisible(true);
-    Animated.timing(slideAnim, {
-      toValue: 0,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const closeModal = () => {
-    Animated.timing(slideAnim, {
-      toValue: height,
-      duration: 300,
-      useNativeDriver: true,
-    }).start(() => setModalVisible(false));
-  };
+  useEffect(() => {
+    if (visible) {
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 400,
+          useNativeDriver: true,
+        }).start(),
+        Animated.timing(overlayAnim, {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: true,
+        }).start(),
+      ]);
+    } else {
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: height,
+          duration: 400,
+          useNativeDriver: true,
+        }).start(),
+        Animated.timing(overlayAnim, {
+          toValue: 0,
+          duration: 400,
+          useNativeDriver: true,
+        }).start(),
+      ]);
+    }
+  }, [visible]);
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={openModal}>
-        <Text>Show Modal</Text>
-      </TouchableOpacity>
+    <Modal
+      transparent={true}
+      visible={visible}
+      animationType="none"
+      onRequestClose={onClose}>
+      <Animated.View
+        style={[
+          styles.overlay,
+          {
+            opacity: overlayAnim,
+          },
+        ]}>
+        <TouchableOpacity style={{ flex: 1 }} onPress={onClose} />
+      </Animated.View>
 
-      <Modal
-        transparent={true}
-        visible={modalVisible}
-        animationType="none" // Disable default animation
-        onRequestClose={closeModal}
-      >
-        <TouchableOpacity style={styles.overlay} onPress={closeModal}>
-          <View style={{ flex: 1 }} />
-        </TouchableOpacity>
-        
-        <Animated.View style={[styles.modalContent, { transform: [{ translateY: slideAnim }] }]}>
-          <View style={styles.iconContainer}>
-            {/* Your icon here */}
-            <View style={styles.icon}>
-              <Text>Icon</Text>
-            </View>
-          </View>
-          <Text style={styles.title}>Come back soon!</Text>
-          <Text style={styles.message}>Are you sure you want to logout?</Text>
-          <TouchableOpacity style={styles.logoutButton}>
-            <Text style={styles.logoutText}>Yes, Logout</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={closeModal}>
-            <Text style={styles.cancelText}>Cancel</Text>
-          </TouchableOpacity>
-        </Animated.View>
-      </Modal>
-    </View>
+      <Animated.View
+        style={[
+          styles.modalContent,
+          { transform: [{ translateY: slideAnim }] },
+        ]}>
+        {title && <Text style={styles.title}>{title}</Text>}
+        <View style={styles.content}>
+          {children}
+        </View>
+      </Animated.View>
+    </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   overlay: {
     position: 'absolute',
     top: 0,
@@ -89,48 +92,18 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     backgroundColor: '#fff',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    borderTopLeftRadius: radius.xl,
+    borderTopRightRadius: radius.xl,
     padding: 20,
-    alignItems: 'center',
-  },
-  iconContainer: {
-    marginBottom: 16,
-    alignItems: 'center',
-  },
-  icon: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: '#f56a6a',
-    justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 8,
+    marginBottom: 12,
   },
-  message: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  logoutButton: {
-    backgroundColor: '#000',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  logoutText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  cancelText: {
-    color: '#f56a6a',
-    fontSize: 16,
+  content: {
+    width: '100%',
   },
 });
 

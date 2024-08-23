@@ -1,29 +1,17 @@
-import React, { useState, useRef } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-  TouchableOpacity,
-  Modal,
-  Animated,
-  Dimensions,
-} from 'react-native';
-import { appointments as initialAppointments } from '../../constants/appointments';
+import React, {useState} from 'react';
+import {StyleSheet, Text, View, FlatList, TouchableOpacity} from 'react-native';
+import {appointments as initialAppointments} from '../../constants/appointments';
 import colors from '../../constants/colors';
-import { wp, hp } from '../../helpers/common';
 import radius from '../../constants/radius';
 import weight from '../../constants/weight';
 import HugeIcon from '../../assets/icons';
-
-const { height } = Dimensions.get('window');
+import SlideUpModal from '../../components/SlideUpModal/SlideUpModal';
+import {hp, wp} from '../../helpers/common';
 
 const AppointmentScreen = () => {
   const [appointments, setAppointments] = useState(initialAppointments);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const slideAnim = useRef(new Animated.Value(height)).current;
-  const overlayAnim = useRef(new Animated.Value(0)).current;
 
   const handleAccept = id => {
     // Handle accept logic here
@@ -31,68 +19,41 @@ const AppointmentScreen = () => {
   };
 
   const handleReject = id => {
-    setAppointments(prevAppointments => prevAppointments.filter(appointment => appointment.id !== id));
+    setAppointments(prevAppointments =>
+      prevAppointments.filter(appointment => appointment.id !== id),
+    );
     closeModal();
   };
 
   const openModal = order => {
     setSelectedOrder(order);
-    console.log('Selected Order:', order);
     setModalVisible(true);
-    Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 400,
-        useNativeDriver: true,
-      }).start(),
-      Animated.timing(overlayAnim, {
-        toValue: 1,
-        duration: 400,
-        useNativeDriver: true,
-      }).start(),
-    ]);
   };
 
   const closeModal = () => {
-    Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue: height,
-        duration: 400,
-        useNativeDriver: true,
-      }).start(),
-      Animated.timing(overlayAnim, {
-        toValue: 0,
-        duration: 400,
-        useNativeDriver: true,
-      }).start(() => {
-        setModalVisible(false);
-      }),
-    ]);
+    setModalVisible(false);
   };
 
-  const renderItem = ({ item }) => {
-    console.log('Render Item:', item);
-    return (
-      <TouchableOpacity style={styles.orderItem} onPress={() => openModal(item)}>
-        <View style={styles.firstColumn}>
-          <Text style={styles.title}>{item.title}</Text>
-          <Text style={styles.subtitle}>{item.subtitle}</Text>
-        </View>
-        <View style={styles.secondColumn}>
-          <Text style={styles.time}>{item.time}</Text>
-        </View>
-      </TouchableOpacity>
-    );
-  };
+  const renderItem = ({item}) => (
+    <TouchableOpacity style={styles.orderItem} onPress={() => openModal(item)}>
+      <View style={styles.firstColumn}>
+        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.subtitle}>{item.subtitle}</Text>
+      </View>
+      <View style={styles.secondColumn}>
+        <Text style={styles.time}>{item.time}</Text>
+      </View>
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.container}>
-      {/* title section */}
+      {/* Title section */}
       <View style={styles.firstSection}>
         <Text style={styles.nameTitle}>Appointments</Text>
       </View>
 
-      {/* list section */}
+      {/* List section */}
       <View style={styles.secondSection}>
         <FlatList
           data={appointments}
@@ -103,40 +64,27 @@ const AppointmentScreen = () => {
 
       {/* Modal section */}
       {selectedOrder && (
-        <Modal
-          transparent={true}
+        <SlideUpModal
           visible={modalVisible}
-          animationType="none"
-          onRequestClose={closeModal}>
-          <Animated.View
-            style={[
-              styles.overlay,
-              {
-                opacity: overlayAnim,
-              },
-            ]}>
-            <TouchableOpacity style={{ flex: 1 }} onPress={closeModal} />
-          </Animated.View>
-
-          <Animated.View
-            style={[
-              styles.modalContent,
-              { transform: [{ translateY: slideAnim }] },
-            ]}>
-            <Text style={styles.title}>Request Details</Text>
+          onClose={closeModal}
+          title="Request Details">
+          <View style={styles.messageContent}>
             <View style={styles.messageRow}>
               <HugeIcon name="user" size={25} strokeWidth={1.5} />
-              <Text style={styles.messageText}>{selectedOrder.customerName}</Text>
+              <Text style={styles.messageText}>
+                {selectedOrder.customerName}
+              </Text>
             </View>
             <View style={styles.messageRow}>
               <HugeIcon name="calendar" size={25} strokeWidth={1.5} />
-              <Text style={styles.messageText}>{selectedOrder.appointmentDate}</Text>
+              <Text style={styles.messageText}>
+                {selectedOrder.appointmentDate}
+              </Text>
             </View>
             <View style={styles.messageRow}>
               <HugeIcon name="location" size={25} strokeWidth={1.5} />
               <Text style={styles.messageText}>{selectedOrder.location}</Text>
             </View>
-
             <View style={styles.buttonRow}>
               <TouchableOpacity
                 style={[styles.actionButton, styles.acceptButton]}
@@ -149,8 +97,8 @@ const AppointmentScreen = () => {
                 <Text style={styles.actionText}>Reject</Text>
               </TouchableOpacity>
             </View>
-          </Animated.View>
-        </Modal>
+          </View>
+        </SlideUpModal>
       )}
     </View>
   );
@@ -183,7 +131,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.xs,
     marginBottom: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
@@ -211,24 +159,8 @@ const styles = StyleSheet.create({
     marginHorizontal: wp(4),
     marginBottom: hp(10),
   },
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  modalContent: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    padding: 20,
-    alignItems: 'flex-start',
+  messageContent: {
+    marginVertical: 8,
   },
   messageRow: {
     flexDirection: 'row',

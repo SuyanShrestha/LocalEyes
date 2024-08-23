@@ -6,7 +6,8 @@ export const pendingOrders = [
     time: "2 hrs ago",
     categoryId: "1",
     providerID: "P001",
-    providerName: "Alice Johnson"
+    providerName: "Alice Johnson",
+    appointmentDate: "2024-08-25 14:00",
   },
   {
     id: 2,
@@ -15,7 +16,8 @@ export const pendingOrders = [
     time: "4 hrs ago",
     categoryId: "2",
     providerID: "P002",
-    providerName: "Bob Smith"
+    providerName: "Bob Smith",
+    appointmentDate: "2024-08-26 09:00",
   },
   {
     id: 3,
@@ -24,7 +26,8 @@ export const pendingOrders = [
     time: "6 hrs ago",
     categoryId: "3",
     providerID: "P003",
-    providerName: "Carol White"
+    providerName: "Carol White",
+    appointmentDate: "2024-08-27 11:00",
   },
   {
     id: 4,
@@ -33,7 +36,8 @@ export const pendingOrders = [
     time: "8 hrs ago",
     categoryId: "4",
     providerID: "P004",
-    providerName: "David Brown"
+    providerName: "David Brown",
+    appointmentDate: "2024-08-28 15:00",
   },
   {
     id: 5,
@@ -42,7 +46,8 @@ export const pendingOrders = [
     time: "1 day ago",
     categoryId: "5",
     providerID: "P005",
-    providerName: "Emily Davis"
+    providerName: "Emily Davis",
+    appointmentDate: "2024-08-29 10:00",
   },
   {
     id: 6,
@@ -51,7 +56,8 @@ export const pendingOrders = [
     time: "2 days ago",
     categoryId: "6",
     providerID: "P006",
-    providerName: "Frank Green"
+    providerName: "Frank Green",
+    appointmentDate: "2024-08-30 13:00",
   },
   {
     id: 7,
@@ -60,7 +66,8 @@ export const pendingOrders = [
     time: "3 days ago",
     categoryId: "1",
     providerID: "P007",
-    providerName: "Grace Lee"
+    providerName: "Grace Lee",
+    appointmentDate: "2024-08-31 16:00",
   },
   {
     id: 8,
@@ -69,7 +76,8 @@ export const pendingOrders = [
     time: "5 hrs ago",
     categoryId: "2",
     providerID: "P008",
-    providerName: "Henry Wilson"
+    providerName: "Henry Wilson",
+    appointmentDate: "2024-09-01 09:30",
   },
   {
     id: 9,
@@ -78,7 +86,8 @@ export const pendingOrders = [
     time: "1 day ago",
     categoryId: "3",
     providerID: "P009",
-    providerName: "Ivy Clark"
+    providerName: "Ivy Clark",
+    appointmentDate: "2024-09-02 12:00",
   },
   {
     id: 10,
@@ -87,7 +96,8 @@ export const pendingOrders = [
     time: "7 hrs ago",
     categoryId: "4",
     providerID: "P010",
-    providerName: "Jack Scott"
+    providerName: "Jack Scott",
+    appointmentDate: "2024-09-03 14:30",
   },
   {
     id: 11,
@@ -96,7 +106,8 @@ export const pendingOrders = [
     time: "4 days ago",
     categoryId: "5",
     providerID: "P011",
-    providerName: "Karen Adams"
+    providerName: "Karen Adams",
+    appointmentDate: "2024-09-04 11:00",
   },
   {
     id: 12,
@@ -105,6 +116,7 @@ export const pendingOrders = [
     time: "6 days ago",
     categoryId: "6",
     providerID: "P012",
-    providerName: "Laura Evans"
+    providerName: "Laura Evans",
+    appointmentDate: "2024-09-05 10:30",
   }
 ];
