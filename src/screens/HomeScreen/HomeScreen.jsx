@@ -77,7 +77,7 @@ const HomeScreen = ({navigation}) => {
       {/* search container */}
       <View style={styles.searchContainer}>
         <Input
-          icon={<HugeIcon name="userSearch" size={26} strokeWidth={1.6} />}
+          icon={<HugeIcon name="userSearch" size={26} strokeWidth={1.5} />}
           placeholder="Who do you want to hire?"
           onChangeText={value => setSearchTerm(value)}
         />
