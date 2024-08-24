@@ -1,24 +1,27 @@
 import React, {useState} from 'react';
 import {StyleSheet, Text, View, FlatList, TouchableOpacity} from 'react-native';
-import {pendingOrders as initialOrders} from '../../constants/orders';
+import {appointments as initialAppointments} from '../../constants/appointments';
 import colors from '../../constants/colors';
-import HugeIcon from '../../assets/icons';
-import SlideUpModal from '../../components/SlideUpModal/SlideUpModal';
-import {wp, hp} from '../../helpers/common';
 import radius from '../../constants/radius';
 import weight from '../../constants/weight';
-import SearchBar from '../../components/SearchBar/SearchBar';
-import { EmptyLottie } from '../../assets/lottie';
-import LottieComponent from '../../components/LottieComponent/LottieComponent';
+import HugeIcon from '../../assets/icons';
+import SlideUpModal from '../../components/SlideUpModal/SlideUpModal';
+import {hp, wp} from '../../helpers/common';
 
-const OrdersScreen = () => {
-  const [orders, setOrders] = useState(initialOrders);
+const AppointmentScreen = () => {
+  const [appointments, setAppointments] = useState(initialAppointments);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
 
-  const handleDelete = id => {
-    setOrders(prevOrders => prevOrders.filter(order => order.id !== id));
+  const handleAccept = id => {
+    // Handle accept logic here
+    closeModal();
+  };
+
+  const handleReject = id => {
+    setAppointments(prevAppointments =>
+      prevAppointments.filter(appointment => appointment.id !== id),
+    );
     closeModal();
   };
 
@@ -31,13 +34,6 @@ const OrdersScreen = () => {
     setModalVisible(false);
   };
 
-  // Filter orders (by both title and subtitle)
-  const filteredOrders = orders.filter(
-    order =>
-      order.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.subtitle.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
-
   const renderItem = ({item}) => (
     <TouchableOpacity style={styles.orderItem} onPress={() => openModal(item)}>
       <View style={styles.firstColumn}>
@@ -45,14 +41,6 @@ const OrdersScreen = () => {
         <Text style={styles.subtitle}>{item.subtitle}</Text>
       </View>
       <View style={styles.secondColumn}>
-        <View style={styles.actionButtons}>
-          <TouchableOpacity>
-            <HugeIcon name="star" size={25} strokeWidth={1.5} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleDelete(item.id)}>
-            <HugeIcon name="delete" size={25} strokeWidth={1.5} />
-          </TouchableOpacity>
-        </View>
         <Text style={styles.time}>{item.time}</Text>
       </View>
     </TouchableOpacity>
@@ -62,37 +50,16 @@ const OrdersScreen = () => {
     <View style={styles.container}>
       {/* Title section */}
       <View style={styles.firstSection}>
-        <Text style={styles.nameTitle}>Pending Orders</Text>
+        <Text style={styles.nameTitle}>Appointments</Text>
       </View>
 
       {/* List section */}
       <View style={styles.secondSection}>
-        {/* Search Bar */}
-        <SearchBar
-          placeholder="Search orders"
-          onSearch={setSearchTerm}
-          style={styles.searchBar}
+        <FlatList
+          data={appointments}
+          renderItem={renderItem}
+          keyExtractor={item => item.id.toString()}
         />
-
-        {filteredOrders.length > 0 ? (
-          <FlatList
-            data={filteredOrders}
-            renderItem={renderItem}
-            keyExtractor={item => item.id.toString()}
-            style={styles.orderList}
-          />
-        ) : (
-          <View style={styles.emptyState}>
-            <LottieComponent
-              animationData={EmptyLottie}
-              width={wp(100)}
-              height={wp(100)}
-            />
-            <Text style={styles.noOrdersText}>
-              No such orders found.
-            </Text>
-          </View>
-        )}
       </View>
 
       {/* Modal section */}
@@ -100,12 +67,12 @@ const OrdersScreen = () => {
         <SlideUpModal
           visible={modalVisible}
           onClose={closeModal}
-          title="Order Details">
+          title="Request Details">
           <View style={styles.messageContent}>
             <View style={styles.messageRow}>
               <HugeIcon name="user" size={25} strokeWidth={1.5} />
               <Text style={styles.messageText}>
-                {selectedOrder.providerName}
+                {selectedOrder.customerName}
               </Text>
             </View>
             <View style={styles.messageRow}>
@@ -114,6 +81,22 @@ const OrdersScreen = () => {
                 {selectedOrder.appointmentDate}
               </Text>
             </View>
+            <View style={styles.messageRow}>
+              <HugeIcon name="location" size={25} strokeWidth={1.5} />
+              <Text style={styles.messageText}>{selectedOrder.location}</Text>
+            </View>
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.acceptButton]}
+                onPress={() => handleAccept(selectedOrder.id)}>
+                <Text style={styles.actionText}>Accept</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.rejectButton]}
+                onPress={() => handleReject(selectedOrder.id)}>
+                <Text style={styles.actionText}>Reject</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </SlideUpModal>
       )}
@@ -121,14 +104,13 @@ const OrdersScreen = () => {
   );
 };
 
-export default OrdersScreen;
+export default AppointmentScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
   firstSection: {
-    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
@@ -139,14 +121,6 @@ const styles = StyleSheet.create({
     fontSize: hp(2.5),
     fontWeight: weight.semibold,
     color: colors.secondaryColor30,
-  },
-  searchBar: {
-    width: wp(90),
-    marginVertical: hp(2),
-    alignSelf: 'center',
-  },
-  orderList: {
-    marginBottom: hp(10),
   },
   orderItem: {
     flexDirection: 'row',
@@ -176,36 +150,18 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   secondColumn: {
-    flexDirection: 'column',
     alignItems: 'center',
-    gap: hp(1),
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    gap: wp(4),
   },
   time: {
     fontSize: wp(3.5),
     color: '#999',
   },
   secondSection: {
-    height: '100%',
     marginHorizontal: wp(4),
-    backgroundColor: colors.primaryColor60,
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  noOrdersText: {
-    fontSize: hp(2),
-    fontWeight: weight.medium,
-    color: colors.text,
-    marginTop: hp(2),
+    marginBottom: hp(10),
   },
   messageContent: {
-    marginTop: 8,
+    marginVertical: 8,
   },
   messageRow: {
     flexDirection: 'row',
@@ -220,10 +176,11 @@ const styles = StyleSheet.create({
   },
   buttonRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     width: '100%',
   },
   actionButton: {
+    flex: 1,
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
@@ -231,6 +188,9 @@ const styles = StyleSheet.create({
   },
   acceptButton: {
     backgroundColor: colors.primary,
+  },
+  rejectButton: {
+    backgroundColor: '#f56a6a',
   },
   actionText: {
     color: '#fff',
