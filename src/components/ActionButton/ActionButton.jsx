@@ -15,7 +15,7 @@ const ActionButton = ({buttonText, onPress, backgroundColor, textColor}) => {
       <Text
         style={[
           styles.buttonText,
-          {color: textColor || colors.white},
+          {color: textColor || colors.secondaryColor30},
         ]}>
         {buttonText}
       </Text>
@@ -38,6 +38,5 @@ const styles = StyleSheet.create({
     borderCurve: 'continuous',
   },
   buttonText: {
-    // color: colors.white,
   },
 });

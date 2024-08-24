@@ -46,7 +46,7 @@ const SignUpScreen = ({navigation}) => {
   };
 
   return (
-    <ScreenWrapper bg={colors.white}>
+    <ScreenWrapper bg={colors.secondaryColor30}>
       <View style={styles.container}>
         <View style={styles.topSection}>
           <BackButton navigation={navigation} />

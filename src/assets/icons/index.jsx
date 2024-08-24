@@ -24,6 +24,7 @@ import Tick02Icon from './Tick02Icon';
 import Cancel01Icon from './Cancel01Icon';
 import Calendar01Icon from './Calendar01Icon';
 import Location05Icon from './Location05Icon';
+import Agreement02Icon from './Agreement02Icon';
 
 const icons = {
   home: Home01Icon,
@@ -48,6 +49,7 @@ const icons = {
   cancel: Cancel01Icon,
   calendar: Calendar01Icon,
   location: Location05Icon,
+  agreement: Agreement02Icon,
 };
 
 const HugeIcon = ({name, ...props}) => {

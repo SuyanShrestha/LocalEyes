@@ -7,15 +7,14 @@ import {
   TouchableOpacity,
   Linking,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 import globalStyles from '../../styles/globalStyles';
 import {hp, wp} from '../../helpers/common';
 import colors from '../../constants/colors';
 import weight from '../../constants/weight';
 import radius from '../../constants/radius';
 import HamburgerMenu from '../../components/HamburgerMenu/HamburgerMenu';
-
-import {ContactImage} from '../../assets/images';
+import BackButton from '../../components/BackButton/BackButton';
 import HugeIcon from '../../assets/icons';
 
 const Contact = ({navigation}) => {
@@ -45,24 +44,21 @@ const Contact = ({navigation}) => {
 
   return (
     <ScrollView contentContainerStyle={[globalStyles.container]}>
-      {/* first container */}
-      <View style={styles.firstContainer}>
-        <View style={styles.nameContainer}>
-          <Text style={styles.nameTitle}>Contact Us</Text>
-        </View>
-
-        {/* hamburger */}
-        <HamburgerMenu navigation={navigation} />
+      {/* Header Section */}
+      <View style={styles.headerSection}>
+        <BackButton navigation={navigation} />
+        <Text style={styles.header}>Contact Us</Text>
+        <HamburgerMenu navigation={navigation} size={20} />
       </View>
 
-      {/* second container */}
+      {/* Content Section */}
       <View style={styles.secondContainer}>
         <Text style={styles.introText}>
           Got questions? We're excited to assist you!
         </Text>
 
         <View style={styles.secondContainerContent}>
-          {/* first section */}
+          {/* Direct Contact */}
           <View style={styles.directLinkContainer}>
             <View style={styles.linkedContacts}>
               <TouchableOpacity
@@ -80,12 +76,17 @@ const Contact = ({navigation}) => {
               <TouchableOpacity
                 style={styles.buttonDiv}
                 onPress={handleMailPress}>
-                <HugeIcon name="mail" strokeWidth={2.5} color={colors.textDark} />
+                <HugeIcon
+                  name="mail"
+                  strokeWidth={2.5}
+                  color={colors.textDark}
+                />
               </TouchableOpacity>
               <Text>sh.suyan16@gmail.com</Text>
             </View>
           </View>
-          {/* second section */}
+
+          {/* Social Media */}
           <View style={styles.socialContainer}>
             <Text style={styles.introText}>Get Connected!</Text>
             <View style={styles.socialButtons}>
@@ -136,32 +137,20 @@ const Contact = ({navigation}) => {
 export default Contact;
 
 const styles = StyleSheet.create({
-  firstContainer: {
+  headerSection: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: colors.primary,
-    height: hp(12),
+    height: hp(8),
     paddingHorizontal: wp(5),
+    marginBottom: hp(2),
   },
-  nameContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: wp(1),
-  },
-  logo: {
-    width: 50,
-    height: 50,
-    borderRadius: 50,
-    resizeMode: 'contain',
-  },
-  nameTitle: {
-    fontSize: hp(3.5),
-    fontWeight: weight.bold,
+  header: {
+    fontSize: hp(2.5),
+    fontWeight: weight.semibold,
     color: colors.secondaryColor30,
-    width: wp(50),
   },
   secondContainer: {
     minHeight: hp(82),
@@ -174,7 +163,6 @@ const styles = StyleSheet.create({
     fontSize: hp(1.75),
     marginBottom: hp(1),
     textAlign: 'center',
-    // fontWeight: weight.semibold,
     width: '100%',
   },
   secondContainerContent: {

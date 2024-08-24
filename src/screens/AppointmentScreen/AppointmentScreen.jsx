@@ -140,9 +140,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 8,
+    color: colors.text,
+    marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,

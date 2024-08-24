@@ -4,43 +4,34 @@ import {
   Text,
   View,
   Image,
-  TouchableOpacity,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, { useState } from 'react';
 import globalStyles from '../../styles/globalStyles';
-import Input from '../../components/Input/Input';
+import SearchBar from '../../components/SearchBar/SearchBar';
 import HugeIcon from '../../assets/icons';
-import {hp, wp} from '../../helpers/common';
+import { hp, wp } from '../../helpers/common';
 import colors from '../../constants/colors';
 import weight from '../../constants/weight';
 import radius from '../../constants/radius';
 import CategoryList from '../../components/CategoryList/CategoryList';
 import HamburgerMenu from '../../components/HamburgerMenu/HamburgerMenu';
-import {categories} from '../../constants/categories';
-
+import { categories } from '../../constants/categories';
 import LottieComponent from '../../components/LottieComponent/LottieComponent';
-import { EmptyLottie, EmptyLottie2 } from '../../assets/lottie';
+import { EmptyLottie2 } from '../../assets/lottie';
 
-const HomeScreen = ({navigation}) => {
-  const [searchTerm, setSearchTerm] = useState('');
+const HomeScreen = ({ navigation }) => {
   const [filteredCategories, setFilteredCategories] = useState(categories);
-  const [timeoutId, setTimeoutId] = useState(null);
 
-  // for search using debounce
-  useEffect(() => {
-    if (timeoutId) clearTimeout(timeoutId);
+  const handleSearch = (searchTerm) => {
+    const filtered = categories.filter(category =>
+      category.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+    setFilteredCategories(filtered);
+  };
 
-    const newTimeoutId = setTimeout(() => {
-      const filtered = categories.filter(category =>
-        category.name.toLowerCase().includes(searchTerm.toLowerCase()),
-      );
-      setFilteredCategories(filtered);
-    }, 500);
-
-    setTimeoutId(newTimeoutId);
-
-    return () => clearTimeout(newTimeoutId); 
-  }, [searchTerm]);
+  const handleCategoryPress = (category) => {
+    navigation.navigate('ProvidersScreen', { category });
+  };
 
   return (
     <ScrollView contentContainerStyle={[globalStyles.container]}>
@@ -60,11 +51,18 @@ const HomeScreen = ({navigation}) => {
         <HamburgerMenu navigation={navigation} />
       </View>
 
+      {/* search bar */}
+      <SearchBar
+        placeholder="What service do you want?"
+        onSearch={handleSearch}
+        style={styles.searchBar}
+      />
+
       {/* second container */}
       <View style={styles.secondContainer}>
         <Text style={styles.sectionTitle}>Services</Text>
         {filteredCategories.length > 0 ? (
-          <CategoryList categories={filteredCategories} />
+          <CategoryList categories={filteredCategories} onCategoryPress={handleCategoryPress}/>
         ) : (
           <LottieComponent
             animationData={EmptyLottie2}
@@ -73,20 +71,9 @@ const HomeScreen = ({navigation}) => {
           />
         )}
       </View>
-
-      {/* search container */}
-      <View style={styles.searchContainer}>
-        <Input
-          icon={<HugeIcon name="userSearch" size={26} strokeWidth={1.5} />}
-          placeholder="Who do you want to hire?"
-          onChangeText={value => setSearchTerm(value)}
-        />
-      </View>
     </ScrollView>
   );
 };
-
-export default HomeScreen;
 
 const styles = StyleSheet.create({
   firstContainer: {
@@ -124,7 +111,7 @@ const styles = StyleSheet.create({
     width: wp(50),
   },
   secondContainer: {
-    minHeight: hp(69),
+    height: '100%',
     paddingTop: hp(5),
     paddingHorizontal: wp(5),
     backgroundColor: colors.primaryColor60,
@@ -135,14 +122,12 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: hp(3),
   },
-  searchContainer: {
-    marginHorizontal: wp(5),
-    width: wp(90),
+  searchBar: {
     position: 'absolute',
-    top: hp(21),
+    top: hp(22),
+    width: wp(90),
     zIndex: 10,
-    backgroundColor: colors.secondaryColor30,
-    borderRadius: radius.xxl,
-    borderCurve: 'continuous',
   },
 });
+
+export default HomeScreen;
