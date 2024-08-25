@@ -1,8 +1,9 @@
 import React from 'react';
-import AppStack from './src/navigation/AppStack';
+// import AuthStack from './src/navigation/AuthStack';
+import Providers from './src/navigation';
 
 const App = () => {
-  return <AppStack />;
+  return <Providers />;
 };
 
 export default App;

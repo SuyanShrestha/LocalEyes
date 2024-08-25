@@ -8,13 +8,15 @@ import {
   TouchableOpacity,
   Button,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
+import { AuthContext } from '../../navigation/AuthProvider';
 
 const ProfileScreen = () => {
-  const [user, setUser] = useState(null);
 
   // dummy for now
   const [ownProfile, setOwnProfile] = useState(false);
+
+  const {user, logout} = useContext(AuthContext);
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
@@ -39,7 +41,7 @@ const ProfileScreen = () => {
             <TouchableOpacity style={styles.userBtn} onPress={() => {}}>
               <Text style={styles.userBtnTxt}>Edit</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.userBtn} onPress={() => {}}>
+            <TouchableOpacity style={styles.userBtn} onPress={() => logout()}>
               <Text style={styles.userBtnTxt}>Logout</Text>
             </TouchableOpacity>
           </View>
