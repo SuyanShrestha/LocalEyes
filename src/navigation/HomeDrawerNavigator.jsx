@@ -6,6 +6,7 @@ import ProfileScreen from '../screens/ProfileScreen/ProfileScreen';
 import Contact from '../screens/Contact/Contact';
 import ProvidersScreen from '../screens/ProvidersScreen/ProvidersScreen';
 import colors from '../constants/colors';
+import FavouritesScreen from '../screens/FavouritesScreen/FavouritesScreen';
 
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
@@ -37,6 +38,7 @@ const HomeDrawerNavigator = () => {
       }}>
       <Drawer.Screen name="Home" component={HomeStackNavigator} /> 
       <Drawer.Screen name="Profile" component={ProfileScreen} />
+      <Drawer.Screen name="Favourites" component={FavouritesScreen} />
       <Drawer.Screen name="Contact" component={Contact} />
     </Drawer.Navigator>
   );
