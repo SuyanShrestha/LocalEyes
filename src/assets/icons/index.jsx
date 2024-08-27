@@ -26,6 +26,9 @@ import Calendar01Icon from './Calendar01Icon';
 import Location05Icon from './Location05Icon';
 import Agreement02Icon from './Agreement02Icon';
 import FilterIcon from './FilterIcon';
+import UserAdd01Icon from './UserAdd01Icon';
+import HeartAddIcon from './HeartAddIcon';
+import HeartCheckIcon from './HeartCheckIcon';
 
 const icons = {
   home: Home01Icon,
@@ -34,6 +37,7 @@ const icons = {
   lock: SquareLock02Icon,
   user: UserIcon,
   userSearch: UserSearch01Icon,
+  userAdd: UserAdd01Icon,
   note: NoteIcon,
   notification: Notification02Icon,
   menu: Menu11Icon,
@@ -52,6 +56,8 @@ const icons = {
   location: Location05Icon,
   agreement: Agreement02Icon,
   filter: FilterIcon,
+  heartAdd: HeartAddIcon,
+  heartCheck: HeartCheckIcon,
 };
 
 const HugeIcon = ({name, ...props}) => {

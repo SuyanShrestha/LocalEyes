@@ -20,8 +20,14 @@ import {AuthContext} from '../../navigation/AuthProvider';
 import SlideUpModal from '../../components/SlideUpModal/SlideUpModal';
 import {categories} from '../../constants/categories';
 
-const ProfileScreen2 = ({navigation}) => {
-  const [ownProfile, setOwnProfile] = useState(true);
+const ProfileScreen2 = ({route, navigation}) => {
+  // const [ownProfile, setOwnProfile] = useState(true);
+  const [ownProfile, setOwnProfile] = useState(
+    route.params?.ownProfile ?? true,
+  );
+  const [provider, setProvider] = useState(
+    route.params?.provider ?? true,
+  );
   const [profileDetails, setProfileDetails] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
@@ -29,12 +35,14 @@ const ProfileScreen2 = ({navigation}) => {
   const [fieldToEdit, setFieldToEdit] = useState('');
   const {user, logout} = useContext(AuthContext);
 
+  const [favouriteIcon, setFavouriteIcon] = useState('heartAdd');
+
   useEffect(() => {
     let unsubscribe;
     if (user) {
       unsubscribe = firestore()
         .collection('users')
-        .doc(user.uid)
+        .doc(ownProfile ? user.uid : provider.id)
         .onSnapshot(
           userDoc => {
             if (userDoc.exists) {
@@ -114,6 +122,11 @@ const ProfileScreen2 = ({navigation}) => {
     }
     closeModal();
   };
+
+  // adding and removing favourites
+  const toggleFavourite = () => {
+    setFavouriteIcon(prevIcon => (prevIcon === 'heartAdd' ? 'heartCheck' : 'heartAdd'));
+  }
 
   const renderCategoryItem = ({item}) => (
     <TouchableOpacity
@@ -202,7 +215,57 @@ const ProfileScreen2 = ({navigation}) => {
           </View>
         ) : (
           // other person profile
-          <View></View>
+          <View style={styles.profileContent}>
+            {/* Profile Picture */}
+            <View style={styles.imageDiv}>
+              <Image
+                style={styles.userImg}
+                source={{
+                  uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRooEnD32-UtBw55GBfDTxxUZApMhWWnRaoLw&s',
+                }}
+              />
+            </View>
+
+            <View style={styles.buttonsContainer}>
+              <TouchableOpacity style={styles.buttonContainer}>
+                <HugeIcon name="userAdd" size={26} strokeWidth={1.5} style={styles.addButton}/>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.buttonContainer} onPress={toggleFavourite}>
+                <HugeIcon name={favouriteIcon} size={26} strokeWidth={1.5} style={styles.addButton}/>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.contentSection}>
+              <View style={styles.detailItem}>
+                <Text style={styles.fieldName}>Name</Text>
+                <Text style={styles.fieldValue}>
+                  {profileDetails.find(item => item.field === 'Name')?.value ||
+                    'Not Available'}
+                </Text>
+              </View>
+              <View style={styles.detailItem}>
+                <Text style={styles.fieldName}>Email</Text>
+                <Text style={styles.fieldValue}>
+                  {profileDetails.find(item => item.field === 'Email')?.value ||
+                    'Not Available'}
+                </Text>
+              </View>
+              <View style={styles.detailItem}>
+                <Text style={styles.fieldName}>Phone</Text>
+                <Text style={styles.fieldValue}>
+                  {profileDetails.find(item => item.field === 'Phone')?.value ||
+                    'Not Available'}
+                </Text>
+              </View>
+              <View style={styles.detailItem}>
+                <Text style={styles.fieldName}>Category</Text>
+                <Text style={styles.fieldValue}>
+                  {profileDetails.find(item => item.field === 'Category')
+                    ?.value || 'Not Available'}
+                </Text>
+              </View>
+            </View>
+          </View>
         )}
       </View>
 
@@ -331,6 +394,29 @@ const styles = StyleSheet.create({
     fontSize: hp(2.25),
     color: colors.text,
   },
+
+  // other profile
+  buttonsContainer: {
+    flexDirection: 'row',
+    justifyContent:'space-around',
+    marginBottom: hp(2),
+  },
+  buttonContainer: {
+    backgroundColor: colors.secondaryColor30,
+    padding: wp(2.5),
+    borderRadius: radius.xs,
+    justifyContent: 'center',
+    alignItems: 'center',
+
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  addButton: {
+    color: colors.text,
+  }
 });
 
 export default ProfileScreen2;

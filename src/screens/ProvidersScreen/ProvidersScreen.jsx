@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {
   View,
   Text,
@@ -11,21 +11,22 @@ import BackButton from '../../components/BackButton/BackButton';
 import HamburgerMenu from '../../components/HamburgerMenu/HamburgerMenu';
 // import { users } from '../../constants/users';
 import colors from '../../constants/colors';
-import { wp, hp } from '../../helpers/common';
+import {wp, hp} from '../../helpers/common';
 import radius from '../../constants/radius';
 import weight from '../../constants/weight';
 import HugeIcon from '../../assets/icons';
 import SearchBar from '../../components/SearchBar/SearchBar';
 import LottieComponent from '../../components/LottieComponent/LottieComponent';
-import { EmptyLottie } from '../../assets/lottie';
+import {EmptyLottie} from '../../assets/lottie';
 
 import firestore from '@react-native-firebase/firestore';
+import {AuthContext} from '../../navigation/AuthProvider';
 
-
-const ProvidersScreen = ({ route, navigation }) => {
-  const { category } = route.params;
+const ProvidersScreen = ({route, navigation}) => {
+  const {category} = route.params;
   const [searchTerm, setSearchTerm] = useState('');
   const [providers, setProviders] = useState([]);
+  const {user} = useContext(AuthContext);
 
   useEffect(() => {
     const unsubscribe = firestore()
@@ -40,21 +41,27 @@ const ProvidersScreen = ({ route, navigation }) => {
           setProviders(users);
         },
         error => {
-          console.error("Error fetching providers: ", error);
-        }
+          console.error('Error fetching providers: ', error);
+        },
       );
 
     return () => unsubscribe();
   }, [category.id]);
 
-  const filteredProviders = providers.filter(provider =>
-    provider.username.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProviders = providers
+    .filter(provider => provider.id !== user?.uid) // done to exclude the current user from the list
+    .filter(provider =>
+      provider.username.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
 
-  const renderUser = ({ item }) => (
-    <TouchableOpacity style={styles.userCard}>
+  const renderUser = ({item}) => (
+    <TouchableOpacity
+      style={styles.userCard}
+      onPress={() =>
+        navigation.navigate('Profile', {ownProfile: false, provider: item})
+      }>
       <View style={styles.userInfo}>
-        <Image source={{ uri: item.profilePic }} style={styles.profilePic} />
+        <Image source={{uri: item.profilePic}} style={styles.profilePic} />
         <View style={styles.textContainer}>
           <Text style={styles.username}>{item.username}</Text>
         </View>
@@ -86,7 +93,7 @@ const ProvidersScreen = ({ route, navigation }) => {
     <View style={styles.container}>
       <View style={styles.headerSection}>
         <BackButton navigation={navigation} />
-        <Text style={styles.header}>{category.name} Providers</Text>
+        <Text style={styles.header}>{category.name}s</Text>
         <HamburgerMenu navigation={navigation} size={20} />
       </View>
       <SearchBar
@@ -108,7 +115,7 @@ const ProvidersScreen = ({ route, navigation }) => {
             width={wp(100)}
             height={wp(100)}
           />
-          <Text style={styles.noProvidersText}>No providers found with that name.</Text>
+          <Text style={styles.noProvidersText}>No providers found.</Text>
         </View>
       )}
     </View>
@@ -151,7 +158,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.xs,
     marginBottom: hp(1.5),
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
