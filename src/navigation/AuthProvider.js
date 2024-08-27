@@ -29,7 +29,7 @@ export const AuthProvider = ({children}) => {
           username: name,
           email: email,
           createdAt: firestore.Timestamp.fromDate(new Date()),
-          profilePic: null,
+          profilePic: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRooEnD32-UtBw55GBfDTxxUZApMhWWnRaoLw&s',
           categoryID: '',
           totalRating: null,
           totalAgreements: null,

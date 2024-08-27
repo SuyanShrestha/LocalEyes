@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import BackButton from '../../components/BackButton/BackButton';
 import HamburgerMenu from '../../components/HamburgerMenu/HamburgerMenu';
-import { users } from '../../constants/users';
+// import { users } from '../../constants/users';
 import colors from '../../constants/colors';
 import { wp, hp } from '../../helpers/common';
 import radius from '../../constants/radius';
@@ -19,15 +19,37 @@ import SearchBar from '../../components/SearchBar/SearchBar';
 import LottieComponent from '../../components/LottieComponent/LottieComponent';
 import { EmptyLottie } from '../../assets/lottie';
 
+import firestore from '@react-native-firebase/firestore';
+
+
 const ProvidersScreen = ({ route, navigation }) => {
   const { category } = route.params;
   const [searchTerm, setSearchTerm] = useState('');
+  const [providers, setProviders] = useState([]);
 
-  const filteredUsers = users
-    .filter(user => user.categoryID === category.id)
-    .filter(user =>
-      user.username.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+  useEffect(() => {
+    const unsubscribe = firestore()
+      .collection('users')
+      .where('categoryID', '==', category.id)
+      .onSnapshot(
+        snapshot => {
+          const users = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setProviders(users);
+        },
+        error => {
+          console.error("Error fetching providers: ", error);
+        }
+      );
+
+    return () => unsubscribe();
+  }, [category.id]);
+
+  const filteredProviders = providers.filter(provider =>
+    provider.username.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const renderUser = ({ item }) => (
     <TouchableOpacity style={styles.userCard}>
@@ -72,10 +94,10 @@ const ProvidersScreen = ({ route, navigation }) => {
         onSearch={setSearchTerm}
         style={styles.searchBar}
       />
-      {filteredUsers.length > 0 ? (
+      {filteredProviders.length > 0 ? (
         <FlatList
-          data={filteredUsers}
-          keyExtractor={item => item.uid}
+          data={filteredProviders}
+          keyExtractor={item => item.id}
           renderItem={renderUser}
           contentContainerStyle={styles.listContent}
         />

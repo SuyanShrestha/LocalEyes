@@ -67,7 +67,6 @@ const ProfileScreen2 = ({navigation}) => {
   }, [user]);
 
   const getCategoryName = categoryID => {
-    console.log('Getting categoryID : ', categoryID);
     const category = categories.find(cat => cat.id === categoryID);
     return category ? category.name : 'Not Available';
   };
