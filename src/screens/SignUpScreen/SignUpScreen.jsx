@@ -35,7 +35,14 @@ const SignUpScreen = ({navigation}) => {
       Alert.alert('Sign up', 'Please fill all the fields');
       return;
     }
-    register(emailRef.current, passwordRef.current)
+    try {
+      await register(nameRef.current, emailRef.current, passwordRef.current);
+      Alert.alert('Sign up', 'Registration successful');
+      navigation.navigate('Dashboard');
+    } catch (error) {
+      Alert.alert('Sign up', 'Registration failed');
+      console.log(error);
+    }
   };
 
   return (

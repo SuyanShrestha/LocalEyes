@@ -12,7 +12,6 @@ const Routes = () => {
 
   const onAuthStateChanged = (user) => {
     setUser(user);
-    console.log('after change: ', user)
     if (initializing) setInitializing(false);
   };
 

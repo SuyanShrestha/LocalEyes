@@ -16,36 +16,29 @@ export const AuthProvider = ({children}) => {
     }
   };
 
-  const register = async (email, password) => {
+  const register = async (name, email, password) => {
     try {
-      await auth()
-        .createUserWithEmailAndPassword(email, password)
-        .then(() => {
-          //Once the user creation has happened successfully, we can add the currentUser into firestore
-          //with the appropriate details.
-          firestore()
-            .collection('users')
-            .doc(auth().currentUser.uid)
-            .set({
-              name: '',
-              email: email,
-              createdAt: firestore.Timestamp.fromDate(new Date()),
-              userImg: null,
-            })
-            //ensure we catch any errors at this stage to advise us if something does go wrong
-            .catch(error => {
-              console.log(
-                'Something went wrong with added user to firestore: ',
-                error,
-              );
-            });
-        })
-        //we need to catch the whole sign up process if it fails too.
-        .catch(error => {
-          console.log('Something went wrong with sign up: ', error);
+      const userCredential = await auth().createUserWithEmailAndPassword(email, password);
+      const { uid } = userCredential.user;
+
+      // Add the user to Firestore
+      await firestore()
+        .collection('users')
+        .doc(uid)
+        .set({
+          username: name,
+          email: email,
+          createdAt: firestore.Timestamp.fromDate(new Date()),
+          profilePic: null,
+          categoryID: '',
+          totalRating: null,
+          totalAgreements: null,
+          phone: null,
         });
-    } catch (e) {
-      console.log(e);
+
+      console.log('User added to Firestore with UID:', uid);
+    } catch (error) {
+      console.log('Something went wrong with sign up: ', error);
     }
   };
 

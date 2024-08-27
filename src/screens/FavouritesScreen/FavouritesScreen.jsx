@@ -221,7 +221,6 @@ const styles = StyleSheet.create({
   agreementContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.primaryColor20,
     paddingVertical: hp(0.5),
     paddingHorizontal: wp(2),
     borderRadius: radius.sm,
@@ -234,7 +233,6 @@ const styles = StyleSheet.create({
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.primaryColor20,
     paddingVertical: hp(0.5),
     paddingHorizontal: wp(2),
     borderRadius: radius.sm,
@@ -263,7 +261,10 @@ const styles = StyleSheet.create({
   categoryItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: hp(1.5),
+    paddingBottom: hp(1.5),
+    marginBottom: hp(1.5),
+    borderBottomColor: colors.primaryColor60,
+    borderBottomWidth: 2,
   },
   categoryImage: {
     width: wp(10),

@@ -2,7 +2,7 @@ import React, {useContext} from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/HomeScreen/HomeScreen';
-import ProfileScreen from '../screens/ProfileScreen/ProfileScreen';
+import ProfileScreen2 from '../screens/ProfileScreen/ProfileScreen2';
 import Contact from '../screens/Contact/Contact';
 import ProvidersScreen from '../screens/ProvidersScreen/ProvidersScreen';
 import colors from '../constants/colors';
@@ -37,7 +37,7 @@ const HomeDrawerNavigator = () => {
         drawerInactiveTintColor: colors.textDark,
       }}>
       <Drawer.Screen name="Home" component={HomeStackNavigator} /> 
-      <Drawer.Screen name="Profile" component={ProfileScreen} />
+      <Drawer.Screen name="Profile" component={ProfileScreen2} />
       <Drawer.Screen name="Favourites" component={FavouritesScreen} />
       <Drawer.Screen name="Contact" component={Contact} />
     </Drawer.Navigator>
