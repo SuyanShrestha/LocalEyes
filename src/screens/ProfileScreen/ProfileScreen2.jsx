@@ -152,6 +152,11 @@ const ProfileScreen2 = ({route, navigation}) => {
     closeModal();
   };
 
+  // handling booking
+  const handleBooking = () => {
+    navigation.navigate('BookingScreen', {provider: provider});
+  }
+
   // adding and removing favourites
   const handleFavourite = async () => {
     try {
@@ -274,7 +279,7 @@ const ProfileScreen2 = ({route, navigation}) => {
             </View>
 
             <View style={styles.buttonsContainer}>
-              <TouchableOpacity style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.buttonContainer} onPress={handleBooking}>
                 <HugeIcon
                   name="userAdd"
                   size={26}
@@ -424,7 +429,7 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: colors.secondaryColor30,
+    borderColor: colors.primaryColor60,
     padding: wp(2),
     borderRadius: radius.xs,
     marginBottom: hp(2),

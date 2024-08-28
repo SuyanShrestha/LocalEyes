@@ -107,15 +107,11 @@ const FavouritesScreen = ({navigation}) => {
       };
     });
 
-    // console.log(filteredFavorites);
+  // console.log(filteredFavorites);
 
   // Render each favorite user
   const renderUser = ({item}) => (
-    <TouchableOpacity
-      style={styles.userCard}
-      onPress={() =>
-        navigation.navigate('Profile')
-      }>
+    <TouchableOpacity style={styles.userCard}>
       <View style={styles.userInfo}>
         <Image source={{uri: item.profilePic}} style={styles.profilePic} />
         <View style={styles.textContainer}>

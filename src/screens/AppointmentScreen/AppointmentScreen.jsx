@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {StyleSheet, Text, View, FlatList, TouchableOpacity} from 'react-native';
 import {appointments as initialAppointments} from '../../constants/appointments';
 import colors from '../../constants/colors';
@@ -7,11 +7,14 @@ import weight from '../../constants/weight';
 import HugeIcon from '../../assets/icons';
 import SlideUpModal from '../../components/SlideUpModal/SlideUpModal';
 import {hp, wp} from '../../helpers/common';
+import { AuthContext } from '../../navigation/AuthProvider';
 
 const AppointmentScreen = () => {
   const [appointments, setAppointments] = useState(initialAppointments);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+
+  const {user} = useContext(AuthContext);
 
   const handleAccept = id => {
     // Handle accept logic here

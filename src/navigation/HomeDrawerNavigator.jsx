@@ -7,6 +7,7 @@ import Contact from '../screens/Contact/Contact';
 import ProvidersScreen from '../screens/ProvidersScreen/ProvidersScreen';
 import colors from '../constants/colors';
 import FavouritesScreen from '../screens/FavouritesScreen/FavouritesScreen';
+import BookingScreen from '../screens/BookingScreen/BookingScreen';
 
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
@@ -17,6 +18,7 @@ const HomeStackNavigator = () => {
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
       <Stack.Screen name="ProvidersScreen" component={ProvidersScreen} /> 
       <Stack.Screen name="Profile" component={ProfileScreen2} />
+      <Stack.Screen name="BookingScreen" component={BookingScreen} />
     </Stack.Navigator>
   );
 };

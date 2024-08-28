@@ -29,6 +29,8 @@ import FilterIcon from './FilterIcon';
 import UserAdd01Icon from './UserAdd01Icon';
 import HeartAddIcon from './HeartAddIcon';
 import HeartCheckIcon from './HeartCheckIcon';
+import HeadingIcon from './HeadingIcon';
+import ParagraphIcon from './ParagraphIcon';
 
 const icons = {
   home: Home01Icon,
@@ -58,6 +60,8 @@ const icons = {
   filter: FilterIcon,
   heartAdd: HeartAddIcon,
   heartCheck: HeartCheckIcon,
+  heading: HeadingIcon,
+  paragraph: ParagraphIcon,
 };
 
 const HugeIcon = ({name, ...props}) => {
