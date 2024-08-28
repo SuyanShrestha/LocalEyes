@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 import {StyleSheet, Text, View, FlatList, TouchableOpacity} from 'react-native';
 import {appointments as initialAppointments} from '../../constants/appointments';
 import colors from '../../constants/colors';
@@ -7,21 +7,75 @@ import weight from '../../constants/weight';
 import HugeIcon from '../../assets/icons';
 import SlideUpModal from '../../components/SlideUpModal/SlideUpModal';
 import {hp, wp} from '../../helpers/common';
-import { AuthContext } from '../../navigation/AuthProvider';
+import {AuthContext} from '../../navigation/AuthProvider';
+import firestore from '@react-native-firebase/firestore';
+import moment from 'moment';
 
 const AppointmentScreen = () => {
-  const [appointments, setAppointments] = useState(initialAppointments);
+  // const [appointments, setAppointments] = useState(initialAppointments);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
+  const [appointments, setAppointments] = useState([]);
+  const [appointmentDate, setAppointmentDate] = useState('');
+  const [username, setUsername] = useState('');
+
   const {user} = useContext(AuthContext);
 
-  const handleAccept = id => {
-    // Handle accept logic here
+  useEffect(() => {
+    const unsubscribe = firestore()
+      .collection('bookings')
+      .where('providerID', '==', user.uid)
+      .onSnapshot(snapshot => {
+        const fetchedAppointments = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setAppointments(fetchedAppointments);
+      });
+
+    // Clean up the listener on unmount
+    return () => unsubscribe();
+  }, []);
+
+  const handleAccept = bookingId => {
+    const bookingRef = firestore().collection('bookings').doc(bookingId);
+
+    const unsubscribe = bookingRef.onSnapshot(async doc => {
+      if (doc.exists) {
+        const bookingData = doc.data();
+
+        try {
+          // adding booking data to the orders collection
+          const ordersRef = firestore().collection('orders').doc();
+          await ordersRef.set({
+            customerID: bookingData.customerID,
+            providerID: bookingData.providerID,
+            heading: bookingData.heading,
+            paragraph: bookingData.paragraph,
+            createdAt: firestore.FieldValue.serverTimestamp(),
+          });
+
+          // deleting the accepted booking from the bookings collection
+          await bookingRef.delete();
+
+          alert('Order has been accepted and moved to orders!');
+          unsubscribe();
+        } catch (error) {
+          console.error('Error processing order: ', error);
+          alert('Error accepting the booking. Please try again.');
+        }
+      } else {
+        alert('Booking not found!');
+        unsubscribe();
+      }
+    });
+
     closeModal();
   };
 
-  const handleReject = id => {
+  const handleReject = async id => {
+    await firestore().collection('bookings').doc(id).delete();
     setAppointments(prevAppointments =>
       prevAppointments.filter(appointment => appointment.id !== id),
     );
@@ -31,23 +85,42 @@ const AppointmentScreen = () => {
   const openModal = order => {
     setSelectedOrder(order);
     setModalVisible(true);
+
+    // Fetching username based on customerID for modal
+    const unsubscribe = firestore()
+      .collection('users')
+      .doc(order.customerID)
+      .onSnapshot(doc => {
+        if (doc.exists) {
+          setUsername(doc.data().username);
+        }
+      });
+
+    return () => unsubscribe();
   };
 
   const closeModal = () => {
     setModalVisible(false);
+    setUsername(''); // reset username
   };
 
-  const renderItem = ({item}) => (
-    <TouchableOpacity style={styles.orderItem} onPress={() => openModal(item)}>
-      <View style={styles.firstColumn}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.subtitle}>{item.subtitle}</Text>
-      </View>
-      <View style={styles.secondColumn}>
-        <Text style={styles.time}>{item.time}</Text>
-      </View>
-    </TouchableOpacity>
-  );
+  const renderItem = ({item}) => {
+    const timeAgo = moment(item.createdAt.toDate()).fromNow();
+
+    return (
+      <TouchableOpacity
+        style={styles.orderItem}
+        onPress={() => openModal(item)}>
+        <View style={styles.firstColumn}>
+          <Text style={styles.title}>{item.heading}</Text>
+          <Text style={styles.subtitle}>{item.paragraph}</Text>
+        </View>
+        <View style={styles.secondColumn}>
+          <Text style={styles.time}>{timeAgo}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -72,22 +145,47 @@ const AppointmentScreen = () => {
           onClose={closeModal}
           title="Request Details">
           <View style={styles.messageContent}>
+            {/* username */}
             <View style={styles.messageRow}>
-              <HugeIcon name="user" size={25} strokeWidth={1.5} />
-              <Text style={styles.messageText}>
-                {selectedOrder.customerName}
+              <HugeIcon
+                name="user"
+                size={25}
+                strokeWidth={1.5}
+                color={colors.textDark}
+              />
+              <Text style={[styles.messageText, styles.headingText]}>
+                {username}
               </Text>
             </View>
-            <View style={styles.messageRow}>
-              <HugeIcon name="calendar" size={25} strokeWidth={1.5} />
-              <Text style={styles.messageText}>
-                {selectedOrder.appointmentDate}
-              </Text>
-            </View>
+
+            {/* datetime */}
+            {appointmentDate && (
+              <View style={styles.messageRow}>
+                <HugeIcon name="calendar" size={25} strokeWidth={1.5} />
+                <Text style={styles.messageText}>
+                  {selectedOrder.appointmentDate}
+                </Text>
+              </View>
+            )}
+
+            {/* location */}
             <View style={styles.messageRow}>
               <HugeIcon name="location" size={25} strokeWidth={1.5} />
               <Text style={styles.messageText}>{selectedOrder.location}</Text>
             </View>
+
+            {/* heading */}
+            <View style={styles.messageRow}>
+              <HugeIcon name="heading" size={25} strokeWidth={1.5} />
+              <Text style={[styles.messageText]}>{selectedOrder.heading}</Text>
+            </View>
+
+            {/* paragraph */}
+            <View style={styles.messageRow}>
+              <HugeIcon name="paragraph" size={25} strokeWidth={1.5} />
+              <Text style={styles.messageText}>{selectedOrder.paragraph}</Text>
+            </View>
+
             <View style={styles.buttonRow}>
               <TouchableOpacity
                 style={[styles.actionButton, styles.acceptButton]}
@@ -157,6 +255,8 @@ const styles = StyleSheet.create({
   },
   time: {
     fontSize: wp(3.5),
+    textAlign: 'center',
+    width: wp(25),
     color: '#999',
   },
   secondSection: {
@@ -176,6 +276,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     marginLeft: 8,
+  },
+  headingText: {
+    fontWeight: weight.medium,
   },
   buttonRow: {
     flexDirection: 'row',
