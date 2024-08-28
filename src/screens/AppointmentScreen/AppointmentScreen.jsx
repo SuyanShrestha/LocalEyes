@@ -104,6 +104,7 @@ const AppointmentScreen = () => {
     setUsername(''); // reset username
   };
 
+  // for flatlists
   const renderItem = ({item}) => {
     const timeAgo = moment(item.createdAt.toDate()).fromNow();
 

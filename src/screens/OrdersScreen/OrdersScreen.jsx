@@ -11,11 +11,16 @@ import SearchBar from '../../components/SearchBar/SearchBar';
 import {EmptyLottie} from '../../assets/lottie';
 import LottieComponent from '../../components/LottieComponent/LottieComponent';
 import {AuthContext} from '../../navigation/AuthProvider';
+import moment from 'moment';
+import {Rating} from 'react-native-ratings';
 
 const OrdersScreen = () => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [rateModalVisible, setRateModalVisible] = useState(false);
+  const [userRating, setUserRating] = useState(null);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [providerName, setProviderName] = useState('');
   const [appointmentDate, setAppointmentDate] = useState('');
@@ -63,6 +68,54 @@ const OrdersScreen = () => {
     setModalVisible(false);
   };
 
+  // for rating modal
+  const openRateModal = order => {
+    setSelectedOrder(order);
+    setRateModalVisible(true);
+  };
+
+  const closeRateModal = () => {
+    setRateModalVisible(false);
+  };
+
+  const handleRatingSubmit = async rating => {
+    setUserRating(rating);
+
+    if (!selectedOrder) return;
+
+    const providerRef = firestore()
+      .collection('users')
+      .doc(selectedOrder.providerID);
+
+    try {
+      // used onSnapshot here, but it threw unusual multiple additions, so used runTransaction here afterwards
+      // when using runTransaction update is based on the most recent state of the document
+      await firestore().runTransaction(async transaction => {
+        const providerDoc = await transaction.get(providerRef);
+        if (!providerDoc.exists) {
+          throw new Error('Provider not found!');
+        }
+
+        const providerData = providerDoc.data();
+        const currentTotalRating = providerData.totalRating || 0;
+        const currentTotalAgreement = providerData.totalAgreements || 0;
+        const newTotalRating = currentTotalRating + rating;
+        const newTotalAgreement = currentTotalAgreement + 1;
+
+        transaction.update(providerRef, {
+          totalRating: newTotalRating,
+          totalAgreements: newTotalAgreement,
+        });
+      });
+
+      handleDelete(selectedOrder.id);
+    } catch (error) {
+      console.error('Error updating rating:', error);
+    } finally {
+      closeRateModal();
+    }
+  };
+
   // Filter orders (by both title and subtitle)
   const filteredOrders = orders.filter(
     order =>
@@ -70,27 +123,31 @@ const OrdersScreen = () => {
       order.paragraph.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  const renderItem = ({item}) => (
-    <TouchableOpacity style={styles.orderItem} onPress={() => openModal(item)}>
-      <View style={styles.firstColumn}>
-        <Text style={styles.title}>{item.heading}</Text>
-        <Text style={styles.subtitle}>{item.paragraph}</Text>
-      </View>
-      <View style={styles.secondColumn}>
-        <View style={styles.actionButtons}>
-          <TouchableOpacity>
-            <HugeIcon name="star" size={25} strokeWidth={1.5} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleDelete(item.id)}>
-            <HugeIcon name="delete" size={25} strokeWidth={1.5} />
-          </TouchableOpacity>
+  const renderItem = ({item}) => {
+    const timeAgo = moment(item.createdAt.toDate()).fromNow();
+
+    return (
+      <TouchableOpacity
+        style={styles.orderItem}
+        onPress={() => openModal(item)}>
+        <View style={styles.firstColumn}>
+          <Text style={styles.title}>{item.heading}</Text>
+          <Text style={styles.subtitle}>{item.paragraph}</Text>
         </View>
-        <Text style={styles.time}>
-          {new Date(item.createdAt.toDate()).toLocaleString()}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
+        <View style={styles.secondColumn}>
+          <View style={styles.actionButtons}>
+            <TouchableOpacity onPress={() => openRateModal(item)}>
+              <HugeIcon name="star" size={25} strokeWidth={1.5} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleDelete(item.id)}>
+              <HugeIcon name="delete" size={25} strokeWidth={1.5} />
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.time}>{timeAgo}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -164,6 +221,32 @@ const OrdersScreen = () => {
           </View>
         </SlideUpModal>
       )}
+
+      {/* slideup modal for rating */}
+      <SlideUpModal
+        visible={rateModalVisible}
+        onClose={closeRateModal}
+        title="Rate now">
+        <View style={styles.ratingContainer}>
+          <Rating
+            ratingCount={5}
+            fractions={1}
+            jumpValue={0.5}
+            type="custom"
+            ratingColor={colors.primary}
+            imageSize={35}
+            startingValue={0}
+            onFinishRating={setUserRating}
+            style={styles.rating}
+          />
+        </View>
+
+        <TouchableOpacity
+          style={styles.submitButton}
+          onPress={() => handleRatingSubmit(userRating)}>
+          <Text style={styles.submitButtonText}>Submit Rating</Text>
+        </TouchableOpacity>
+      </SlideUpModal>
     </View>
   );
 };
@@ -232,6 +315,8 @@ const styles = StyleSheet.create({
   },
   time: {
     fontSize: wp(3.5),
+    textAlign: 'center',
+    width: wp(25),
     color: '#999',
   },
   secondSection: {
@@ -284,5 +369,23 @@ const styles = StyleSheet.create({
   actionText: {
     color: '#fff',
     fontSize: 16,
+  },
+  ratingContainer: {
+    alignItems: 'center',
+    marginBottom: hp(2),
+  },
+  rating: {
+    marginBottom: hp(2),
+  },
+  submitButton: {
+    backgroundColor: colors.primary,
+    paddingVertical: hp(1.5),
+    borderRadius: radius.sm,
+    alignItems: 'center',
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: hp(2),
+    fontWeight: weight.semibold,
   },
 });
