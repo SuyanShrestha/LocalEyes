@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
 import BackButton from '../../components/BackButton/BackButton';
 import HamburgerMenu from '../../components/HamburgerMenu/HamburgerMenu';
 import {favorites} from '../../constants/favorites';
-import {categories} from '../../constants/categories'; // import categories
+import {categories} from '../../constants/categories';
 import colors from '../../constants/colors';
 import {wp, hp} from '../../helpers/common';
 import radius from '../../constants/radius';
@@ -19,27 +19,103 @@ import HugeIcon from '../../assets/icons';
 import SearchBar from '../../components/SearchBar/SearchBar';
 import LottieComponent from '../../components/LottieComponent/LottieComponent';
 import {EmptyLottie} from '../../assets/lottie';
-import SlideUpModal from '../../components/SlideUpModal/SlideUpModal'; // import SlideUpModal
+import SlideUpModal from '../../components/SlideUpModal/SlideUpModal';
+
+import firestore from '@react-native-firebase/firestore';
+import {AuthContext} from '../../navigation/AuthProvider';
 
 const FavouritesScreen = ({navigation}) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [isModalVisible, setModalVisible] = useState(false); // State for modal visibility
-  const [selectedCategory, setSelectedCategory] = useState(null); // State for selected category
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [favouritesIdArray, setFavouritesIdArray] = useState([]);
+  const [favourites, setFavourites] = useState([]);
+  const [providers, setProviders] = useState([]);
+
+  const {user} = useContext(AuthContext);
+
+  // fetching favourites
+  useEffect(() => {
+    const favouritesDocRef = firestore().collection('favourites').doc(user.uid);
+
+    const unsubscribe = favouritesDocRef.onSnapshot(
+      docSnapshot => {
+        if (docSnapshot.exists) {
+          const data = docSnapshot.data();
+          // console.log(data);
+          if (data) {
+            setFavouritesIdArray(data.favourites || []);
+          }
+        }
+      },
+      error => {
+        console.error('Error fetching favourites document:', error);
+      },
+    );
+
+    // Clean up the listener on component unmount
+    return () => unsubscribe();
+  }, [user.uid]);
+
+  // adding data of respective uid to favourites
+  useEffect(() => {
+    // console.log(favouritesIdArray);
+
+    if (favouritesIdArray.length === 0) {
+      setFavourites([]); // Reset the favourites array if there are no favourites
+      return;
+    }
+
+    const fetchFavourites = async () => {
+      try {
+        const usersSnapshot = await firestore()
+          .collection('users')
+          .where(firestore.FieldPath.documentId(), 'in', favouritesIdArray)
+          .get();
+
+        const favouritesData = usersSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setFavourites(favouritesData);
+      } catch (error) {
+        console.error('Error fetching favourite users:', error);
+      }
+    };
+
+    fetchFavourites();
+  }, [favouritesIdArray]);
 
   // Filter favorites based on search term and selected category
-  const filteredFavorites = favorites.filter(user => {
-    const matchesSearchTerm = user.username
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory
-      ? user.categoryID === selectedCategory.id
-      : true;
-    return matchesSearchTerm && matchesCategory;
-  });
+  const filteredFavorites = favourites
+    .filter(user => {
+      const matchesSearchTerm = user.username
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      const matchesCategory = selectedCategory
+        ? user.categoryID === selectedCategory.id
+        : true;
+      // console.log(user);
+      return matchesSearchTerm && matchesCategory;
+    })
+    .map(user => {
+      const category = categories.find(cat => cat.id === user.categoryID);
+      return {
+        ...user,
+        categoryName: category ? category.name : 'Unknown', // Adding categoryName too to each user object alongside categoryID
+      };
+    });
+
+    // console.log(filteredFavorites);
 
   // Render each favorite user
   const renderUser = ({item}) => (
-    <TouchableOpacity style={styles.userCard}>
+    <TouchableOpacity
+      style={styles.userCard}
+      onPress={() =>
+        navigation.navigate('Profile')
+      }>
       <View style={styles.userInfo}>
         <Image source={{uri: item.profilePic}} style={styles.profilePic} />
         <View style={styles.textContainer}>
@@ -93,7 +169,7 @@ const FavouritesScreen = ({navigation}) => {
       {filteredFavorites.length > 0 ? (
         <FlatList
           data={filteredFavorites}
-          keyExtractor={item => item.uid}
+          keyExtractor={item => item.id}
           renderItem={renderUser}
           contentContainerStyle={styles.listContent}
         />

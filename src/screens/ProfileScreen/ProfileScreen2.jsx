@@ -23,11 +23,9 @@ import {categories} from '../../constants/categories';
 const ProfileScreen2 = ({route, navigation}) => {
   // const [ownProfile, setOwnProfile] = useState(true);
   const [ownProfile, setOwnProfile] = useState(
-    route.params?.ownProfile ?? true,
+    route.params?.ownProfile ?? true, // because this nullish coalescing operator (??) is better than ||
   );
-  const [provider, setProvider] = useState(
-    route.params?.provider ?? true,
-  );
+  const [provider, setProvider] = useState(route.params?.provider ?? true);
   const [profileDetails, setProfileDetails] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
@@ -36,7 +34,9 @@ const ProfileScreen2 = ({route, navigation}) => {
   const {user, logout} = useContext(AuthContext);
 
   const [favouriteIcon, setFavouriteIcon] = useState('heartAdd');
+  const [favourites, setFavourites] = useState([]);
 
+  // for getting user details
   useEffect(() => {
     let unsubscribe;
     if (user) {
@@ -73,6 +73,35 @@ const ProfileScreen2 = ({route, navigation}) => {
       }
     };
   }, [user]);
+
+  // for handling favourites
+  useEffect(() => {
+    const favouritesDocRef = firestore().collection('favourites').doc(user.uid);
+    const unsubscribe = favouritesDocRef.onSnapshot(
+      docSnapshot => {
+        if (docSnapshot.exists) {
+          const data = docSnapshot.data();
+          // console.log(docSnapshot, data);
+          if (data) {
+            setFavourites(data.favourites || []);
+            if (data.favourites && data.favourites.includes(provider.id)) {
+              setFavouriteIcon('heartCheck');
+            } else {
+              setFavouriteIcon('heartAdd');
+            }
+          }
+        } else {
+          console.log('Favourites document does not exist for this user!');
+        }
+      },
+      error => {
+        console.error('Error fetching favourites document:', error);
+      },
+    );
+
+    // Clean up the listener on component unmount
+    return () => unsubscribe();
+  }, [user.uid, provider.id]);
 
   const getCategoryName = categoryID => {
     const category = categories.find(cat => cat.id === categoryID);
@@ -124,9 +153,27 @@ const ProfileScreen2 = ({route, navigation}) => {
   };
 
   // adding and removing favourites
-  const toggleFavourite = () => {
-    setFavouriteIcon(prevIcon => (prevIcon === 'heartAdd' ? 'heartCheck' : 'heartAdd'));
-  }
+  const handleFavourite = async () => {
+    try {
+      const favouritesDocRef = firestore()
+        .collection('favourites')
+        .doc(user.uid);
+
+      const updatedFavourites = favourites.includes(provider.id)
+        ? favourites.filter(id => id !== provider.id)
+        : [...favourites, provider.id];
+
+      await favouritesDocRef.set(
+        {
+          uid: user.uid,
+          favourites: updatedFavourites,
+        },
+        {merge: true},
+      );
+    } catch (error) {
+      console.error('Error updating favourites:', error);
+    }
+  };
 
   const renderCategoryItem = ({item}) => (
     <TouchableOpacity
@@ -228,10 +275,22 @@ const ProfileScreen2 = ({route, navigation}) => {
 
             <View style={styles.buttonsContainer}>
               <TouchableOpacity style={styles.buttonContainer}>
-                <HugeIcon name="userAdd" size={26} strokeWidth={1.5} style={styles.addButton}/>
+                <HugeIcon
+                  name="userAdd"
+                  size={26}
+                  strokeWidth={1.5}
+                  style={styles.addButton}
+                />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.buttonContainer} onPress={toggleFavourite}>
-                <HugeIcon name={favouriteIcon} size={26} strokeWidth={1.5} style={styles.addButton}/>
+              <TouchableOpacity
+                style={styles.buttonContainer}
+                onPress={handleFavourite}>
+                <HugeIcon
+                  name={favouriteIcon}
+                  size={26}
+                  strokeWidth={1.5}
+                  style={styles.addButton}
+                />
               </TouchableOpacity>
             </View>
 
@@ -398,7 +457,7 @@ const styles = StyleSheet.create({
   // other profile
   buttonsContainer: {
     flexDirection: 'row',
-    justifyContent:'space-around',
+    justifyContent: 'space-around',
     marginBottom: hp(2),
   },
   buttonContainer: {
@@ -416,7 +475,7 @@ const styles = StyleSheet.create({
   },
   addButton: {
     color: colors.text,
-  }
+  },
 });
 
 export default ProfileScreen2;

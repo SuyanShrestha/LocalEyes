@@ -38,7 +38,7 @@ const HomeDrawerNavigator = () => {
         drawerInactiveTintColor: colors.textDark,
       }}>
       <Drawer.Screen name="Home" component={HomeStackNavigator} /> 
-      <Drawer.Screen name="Profile" component={ProfileScreen2} />
+      <Drawer.Screen name="Profile" component={ProfileScreen2}/>
       <Drawer.Screen name="Favourites" component={FavouritesScreen} />
       <Drawer.Screen name="Contact" component={Contact} />
     </Drawer.Navigator>
