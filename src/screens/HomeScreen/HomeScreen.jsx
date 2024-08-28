@@ -5,7 +5,7 @@ import {
   View,
   Image,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import globalStyles from '../../styles/globalStyles';
 import SearchBar from '../../components/SearchBar/SearchBar';
 import HugeIcon from '../../assets/icons';
@@ -19,8 +19,32 @@ import { categories } from '../../constants/categories';
 import LottieComponent from '../../components/LottieComponent/LottieComponent';
 import { EmptyLottie2 } from '../../assets/lottie';
 
+import firestore from '@react-native-firebase/firestore';
+import { AuthContext } from '../../navigation/AuthProvider';
+
 const HomeScreen = ({ navigation }) => {
   const [filteredCategories, setFilteredCategories] = useState(categories);
+
+  const [userName, setUserName] = useState('');
+  const { user } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (user) {
+      const unsubscribe = firestore()
+        .collection('users')
+        .doc(user.uid)
+        .onSnapshot((doc) => {
+          if (doc.exists) {
+            setUserName(doc.data().username || 'User');
+          }
+        }, (error) => {
+          console.log('Error fetching user data: ', error);
+        });
+
+      // Clean up subscription on unmount
+      return () => unsubscribe();
+    }
+  }, [user]);
 
   const handleSearch = (searchTerm) => {
     const filtered = categories.filter(category =>
@@ -44,7 +68,7 @@ const HomeScreen = ({ navigation }) => {
               style={styles.logo}
             />
           </View>
-          <Text style={styles.nameTitle}>Suyan Shrestha</Text>
+          <Text style={styles.nameTitle}>{userName}</Text>
         </View>
 
         {/* hamburger */}
