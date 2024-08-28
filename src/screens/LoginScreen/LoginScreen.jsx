@@ -28,24 +28,14 @@ const LoginScreen = ({navigation}) => {
   const emailRef = useRef('');
   const passwordRef = useRef('');
   const [loading, setLoading] = useState(false);
-  // const { login } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
 
   const onSubmit = async () => {
     if (!emailRef.current || !passwordRef.current) {
       Alert.alert('Login', 'Please fill all the fields');
       return;
     }
-
-    // setLoading(true);
-    // try {
-    //   await login(emailRef.current, passwordRef.current);
-    //   Alert.alert('Login', 'Logged in successfully!');
-    //   navigation.navigate('Dashboard'); 
-    // } catch (error) {
-    //   Alert.alert('Login', error.message);
-    // } finally {
-    //   setLoading(false);
-    // }
+    login(emailRef.current, passwordRef.current)
   };
   return (
     <ScreenWrapper bg={colors.secondaryColor30}>

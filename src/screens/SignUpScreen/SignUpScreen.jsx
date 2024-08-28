@@ -28,21 +28,21 @@ const SignUpScreen = ({navigation}) => {
   const passwordRef = useRef('');
   const [loading, setLoading] = useState(false);
 
-  // const {register} = useContext(AuthContext);
+  const {register} = useContext(AuthContext);
 
   const onSubmit = async () => {
     if (!nameRef.current || !emailRef.current || !passwordRef.current) {
       Alert.alert('Sign up', 'Please fill all the fields');
       return;
     }
-    // setLoading(true); 
-    // try {
-    //   await register(emailRef.current, passwordRef.current, nameRef.current);
-    // } catch (error) {
-    //   Alert.alert('Sign up', 'Failed to sign up');
-    // } finally {
-    //   setLoading(false); 
-    // }
+    try {
+      await register(nameRef.current, emailRef.current, passwordRef.current);
+      Alert.alert('Sign up', 'Registration successful');
+      navigation.navigate('Dashboard');
+    } catch (error) {
+      Alert.alert('Sign up', 'Registration failed');
+      console.log(error);
+    }
   };
 
   return (
