@@ -1,5 +1,12 @@
 import React, {useState, useEffect, useContext} from 'react';
-import {StyleSheet, Text, View, FlatList, TouchableOpacity} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  TouchableOpacity,
+  Linking,
+} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import colors from '../../constants/colors';
 import HugeIcon from '../../assets/icons';
@@ -23,7 +30,8 @@ const OrdersScreen = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [providerName, setProviderName] = useState('');
-  const [appointmentDate, setAppointmentDate] = useState('');
+  const [appointmentDate, setAppointmentDate] = useState(null);
+  const [phone, setPhone] = useState('');
 
   const {user} = useContext(AuthContext);
 
@@ -49,6 +57,7 @@ const OrdersScreen = () => {
 
   const openModal = order => {
     setSelectedOrder(order);
+    console.log(order);
     setModalVisible(true);
 
     // fetching provider's name based on providerID for modal
@@ -58,6 +67,7 @@ const OrdersScreen = () => {
       .onSnapshot(doc => {
         if (doc.exists) {
           setProviderName(doc.data().username);
+          setPhone(doc.data().phone);
         }
       });
 
@@ -113,6 +123,14 @@ const OrdersScreen = () => {
       console.error('Error updating rating:', error);
     } finally {
       closeRateModal();
+    }
+  };
+
+  const handleCallNow = () => {
+    if (phone) {
+      Linking.openURL(`tel:${phone}`);
+    } else {
+      console.warn('Phone number not available');
     }
   };
 
@@ -174,7 +192,7 @@ const OrdersScreen = () => {
               width={wp(100)}
               height={wp(100)}
             />
-            <Text style={styles.noOrdersText}>No such orders found.</Text>
+            <Text style={styles.noOrdersText}>No orders found.</Text>
           </View>
         )}
       </View>
@@ -198,14 +216,12 @@ const OrdersScreen = () => {
             </View>
 
             {/* datetime */}
-            {appointmentDate && (
-              <View style={styles.messageRow}>
-                <HugeIcon name="calendar" size={25} strokeWidth={1.5} />
-                <Text style={styles.messageText}>
-                  {selectedOrder.appointmentDate}
-                </Text>
-              </View>
-            )}
+            <View style={styles.messageRow}>
+              <HugeIcon name="calendar" size={25} strokeWidth={1.5} />
+              <Text style={styles.messageText}>
+                {selectedOrder.appointmentDate.toDate().toLocaleString()}
+              </Text>
+            </View>
 
             {/* heading */}
             <View style={styles.messageRow}>
@@ -218,6 +234,13 @@ const OrdersScreen = () => {
               <HugeIcon name="paragraph" size={25} strokeWidth={1.5} />
               <Text style={styles.messageText}>{selectedOrder.paragraph}</Text>
             </View>
+
+            {/* call now */}
+            <TouchableOpacity
+              style={[styles.actionButton, styles.callButton]}
+              onPress={handleCallNow}>
+              <Text style={styles.actionText}>Call Now</Text>
+            </TouchableOpacity>
           </View>
         </SlideUpModal>
       )}
@@ -325,7 +348,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primaryColor60,
   },
   emptyState: {
-    flex: 1,
+    display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -357,18 +380,39 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%',
   },
-  actionButton: {
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginHorizontal: 5,
-  },
+  // actionButton: {
+  //   paddingVertical: 12,
+  //   borderRadius: 8,
+  //   alignItems: 'center',
+  //   marginHorizontal: 5,
+  // },
   acceptButton: {
     backgroundColor: colors.primary,
   },
+  // actionText: {
+  //   color: '#fff',
+  //   fontSize: 16,
+  // },
+  actionButton: {
+    backgroundColor: colors.primary,
+    padding: wp(3),
+    borderRadius: radius.xs,
+    marginVertical: hp(1),
+    width: wp(90),
+    alignSelf: 'center',
+  },
   actionText: {
-    color: '#fff',
-    fontSize: 16,
+    fontSize: hp(2.25),
+    fontWeight: weight.bold,
+    color: colors.secondaryColor30,
+    textAlign: 'center',
+  },
+  callButton: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: wp(2),
   },
   ratingContainer: {
     alignItems: 'center',

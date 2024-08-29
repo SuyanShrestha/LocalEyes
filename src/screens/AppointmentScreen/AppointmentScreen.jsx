@@ -10,6 +10,8 @@ import {hp, wp} from '../../helpers/common';
 import {AuthContext} from '../../navigation/AuthProvider';
 import firestore from '@react-native-firebase/firestore';
 import moment from 'moment';
+import {EmptyLottie} from '../../assets/lottie';
+import LottieComponent from '../../components/LottieComponent/LottieComponent';
 
 const AppointmentScreen = () => {
   // const [appointments, setAppointments] = useState(initialAppointments);
@@ -17,7 +19,7 @@ const AppointmentScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const [appointments, setAppointments] = useState([]);
-  const [appointmentDate, setAppointmentDate] = useState('');
+  const [appointmentDate, setAppointmentDate] = useState(null);
   const [username, setUsername] = useState('');
 
   const {user} = useContext(AuthContext);
@@ -32,6 +34,7 @@ const AppointmentScreen = () => {
           ...doc.data(),
         }));
         setAppointments(fetchedAppointments);
+        // console.log(fetchedAppointments);
       });
 
     // Clean up the listener on unmount
@@ -44,6 +47,7 @@ const AppointmentScreen = () => {
     const unsubscribe = bookingRef.onSnapshot(async doc => {
       if (doc.exists) {
         const bookingData = doc.data();
+        console.log(bookingData);
 
         try {
           // adding booking data to the orders collection
@@ -53,6 +57,7 @@ const AppointmentScreen = () => {
             providerID: bookingData.providerID,
             heading: bookingData.heading,
             paragraph: bookingData.paragraph,
+            appointmentDate: bookingData.appointmentDate,
             createdAt: firestore.FieldValue.serverTimestamp(),
           });
 
@@ -132,11 +137,22 @@ const AppointmentScreen = () => {
 
       {/* List section */}
       <View style={styles.secondSection}>
-        <FlatList
-          data={appointments}
-          renderItem={renderItem}
-          keyExtractor={item => item.id.toString()}
-        />
+        {appointments.length > 0 ? (
+          <FlatList
+            data={appointments}
+            renderItem={renderItem}
+            keyExtractor={item => item.id.toString()}
+          />
+        ) : (
+          <View style={styles.emptyState}>
+            <LottieComponent
+              animationData={EmptyLottie}
+              width={wp(100)}
+              height={wp(100)}
+            />
+            <Text style={styles.noAppointmentsText}>No appointments found.</Text>
+          </View>
+        )}
       </View>
 
       {/* Modal section */}
@@ -175,6 +191,13 @@ const AppointmentScreen = () => {
               <Text style={styles.messageText}>{selectedOrder.location}</Text>
             </View>
 
+            {/* calendar */}
+            <View style={styles.messageRow}>
+              <HugeIcon name="calendar" size={25} strokeWidth={1.5} />
+              <Text style={styles.messageText}>{ selectedOrder.appointmentDate.toDate().toLocaleString()}</Text>
+            </View>
+
+
             {/* heading */}
             <View style={styles.messageRow}>
               <HugeIcon name="heading" size={25} strokeWidth={1.5} />
@@ -186,6 +209,8 @@ const AppointmentScreen = () => {
               <HugeIcon name="paragraph" size={25} strokeWidth={1.5} />
               <Text style={styles.messageText}>{selectedOrder.paragraph}</Text>
             </View>
+
+
 
             <View style={styles.buttonRow}>
               <TouchableOpacity
@@ -263,6 +288,17 @@ const styles = StyleSheet.create({
   secondSection: {
     marginHorizontal: wp(4),
     marginBottom: hp(10),
+  },
+  emptyState: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noAppointmentsText: {
+    fontSize: hp(2),
+    fontWeight: weight.medium,
+    color: colors.text,
+    marginTop: hp(2),
   },
   messageContent: {
     marginVertical: 8,
