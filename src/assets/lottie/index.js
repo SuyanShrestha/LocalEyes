@@ -6,6 +6,8 @@ import PlumberLottie from './PlumberLottie.json';
 import GardenerLottie from './GardenerLottie.json';
 import EmptyLottie from './EmptyLottie.json';
 import EmptyLottie2 from './EmptyLottie2.json';
+import LoginLottie from './LoginLottie.json';
+import RegisterLottie from './RegisterLottie.json';
 
 export {
   PainterLottie,
@@ -16,4 +18,6 @@ export {
   GardenerLottie,
   EmptyLottie,
   EmptyLottie2,
+  LoginLottie,
+  RegisterLottie,
 };

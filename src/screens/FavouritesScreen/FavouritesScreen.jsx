@@ -195,18 +195,17 @@ const FavouritesScreen = ({navigation}) => {
               setSelectedCategory(category);
               setModalVisible(false);
             }}>
-            <Image source={category.image} style={styles.categoryImage} />
-            <Text style={styles.modalCategoryName}>{category.name}</Text>
+            <Text style={styles.categoryText}>{category.name}</Text>
           </TouchableOpacity>
         ))}
         {/* Remove All Filters Button */}
         <TouchableOpacity
-          style={styles.removeFiltersButton}
+          style={styles.actionButton}
           onPress={() => {
             setSelectedCategory(null);
             setModalVisible(false);
           }}>
-          <Text style={styles.removeFiltersText}>Remove All Filters</Text>
+          <Text style={styles.actionText}>Remove All Filters</Text>
         </TouchableOpacity>
       </SlideUpModal>
     </View>
@@ -331,36 +330,28 @@ const styles = StyleSheet.create({
   },
   // Styles for the category items in the modal
   categoryItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingBottom: hp(1.5),
-    marginBottom: hp(1.5),
+    padding: wp(3),
     borderBottomColor: colors.primaryColor60,
-    borderBottomWidth: 2,
+    borderBottomWidth: 1,
   },
-  categoryImage: {
-    width: wp(10),
-    height: wp(10),
-    borderRadius: radius.sm,
-    marginRight: wp(4),
-  },
-  modalCategoryName: {
-    fontSize: hp(2),
-    fontWeight: weight.medium,
+  categoryText: {
+    fontSize: hp(2.25),
     color: colors.text,
   },
-  removeFiltersButton: {
-    paddingVertical: hp(1),
-    paddingHorizontal: wp(4),
+
+  actionButton: {
     backgroundColor: colors.primaryDark,
-    borderRadius: radius.sm,
-    marginBottom: hp(2),
+    padding: wp(3),
+    borderRadius: radius.xs,
+    marginVertical: hp(1),
+    width: wp(90),
     alignSelf: 'center',
   },
-  removeFiltersText: {
-    fontSize: hp(2),
-    fontWeight: weight.semibold,
+  actionText: {
+    fontSize: hp(2.25),
+    fontWeight: weight.medium,
     color: colors.secondaryColor30,
+    textAlign: 'center',
   },
 });
 

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, {useState, useContext} from 'react';
 import {
   View,
   Text,
@@ -9,27 +9,39 @@ import {
 import BackButton from '../../components/BackButton/BackButton';
 import HamburgerMenu from '../../components/HamburgerMenu/HamburgerMenu';
 import colors from '../../constants/colors';
-import { wp, hp } from '../../helpers/common';
+import {wp, hp} from '../../helpers/common';
 import weight from '../../constants/weight';
 import radius from '../../constants/radius';
 import HugeIcon from '../../assets/icons';
 import SlideUpModal from '../../components/SlideUpModal/SlideUpModal';
-import { AuthContext } from '../../navigation/AuthProvider';
+import {AuthContext} from '../../navigation/AuthProvider';
 import firestore from '@react-native-firebase/firestore';
+import DatePicker from 'react-native-date-picker';
+import CustomAlert from '../../components/CustomAlert/CustomAlert';
 
-const BookingScreen = ({ navigation, route }) => {
-  const { provider } = route.params;
+const BookingScreen = ({navigation, route}) => {
+  const {provider} = route.params;
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [calendarModalVisible, setCalendarModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
   const [inputValue, setInputValue] = useState('');
   const [fieldToEdit, setFieldToEdit] = useState('');
 
-  const { user } = useContext(AuthContext);
+  const {user} = useContext(AuthContext);
 
-  const [heading, setHeading] = useState('Add heading');
-  const [paragraph, setParagraph] = useState('Add paragraph');
-  const [location, setLocation] = useState('Add location');
+  const [heading, setHeading] = useState('Title');
+  const [paragraph, setParagraph] = useState('Description');
+  const [location, setLocation] = useState('Location');
+  const [calendar, setCalendar] = useState(null);
+  const [appointmentDate, setAppointmentDate] = useState(null);
+
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+
+  const formattedDate = calendar ? calendar.toLocaleDateString() : 'Datetime';
+
+  const [date, setDate] = useState(new Date());
 
   const openModal = (title, field) => {
     setModalTitle(title);
@@ -47,6 +59,12 @@ const BookingScreen = ({ navigation, route }) => {
 
   const closeModal = () => {
     setModalVisible(false);
+    setCalendarModalVisible(false);
+  };
+
+  const openCalendarModal = title => {
+    setModalTitle(title);
+    setCalendarModalVisible(true);
   };
 
   const handleSave = () => {
@@ -60,7 +78,20 @@ const BookingScreen = ({ navigation, route }) => {
     closeModal();
   };
 
+  const handleSaveDate = () => {
+    setAppointmentDate(date);
+    setCalendar(date);
+    closeModal();
+  };
+
   const handleConfirmOrder = async () => {
+    if (!appointmentDate) {
+      setAlertMessage('Please select an appointment date');
+      setAlertVisible(true);
+      setTimeout(() => setAlertVisible(false), 2000);
+      return;
+    }
+
     try {
       const bookingRef = firestore().collection('bookings').doc();
       await bookingRef.set({
@@ -69,13 +100,22 @@ const BookingScreen = ({ navigation, route }) => {
         heading: heading,
         paragraph: paragraph,
         location: location,
+        appointmentDate: firestore.Timestamp.fromDate(appointmentDate),
         createdAt: firestore.FieldValue.serverTimestamp(),
       });
-      alert('Booking confirmed!');
-      navigation.navigate("HomeScreen");
+      setAlertMessage('Booking confirmed!');
+      setAlertVisible(true);
+
+      setTimeout(() => {
+        setAlertVisible(false);
+        navigation.navigate('HomeScreen');
+      }, 1000);
+
     } catch (error) {
       console.error('Error adding document: ', error);
-      alert('Error confirming booking. Please try again.');
+      setAlertMessage('Error confirming booking. Please try again.');
+      setAlertVisible(true);
+      setTimeout(() => setAlertVisible(false), 2000);
     }
   };
 
@@ -111,9 +151,16 @@ const BookingScreen = ({ navigation, route }) => {
           <Text style={styles.fieldValue}>{location}</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={styles.detailItem}
+          onPress={() => openCalendarModal('Calendar')}>
+          <HugeIcon name="calendar" size={20} strokeWidth={1.5} />
+          <Text style={styles.fieldValue}>{formattedDate}</Text>
+        </TouchableOpacity>
+
         {/* confirm button */}
         <TouchableOpacity
-          style={[styles.actionButton, styles.confirmButton]}
+          style={styles.actionButton}
           onPress={handleConfirmOrder}>
           <Text style={styles.actionText}>Confirm Order</Text>
         </TouchableOpacity>
@@ -133,6 +180,25 @@ const BookingScreen = ({ navigation, route }) => {
           <Text style={styles.actionText}>Save</Text>
         </TouchableOpacity>
       </SlideUpModal>
+
+      {/* slideup modal for calendar */}
+      <SlideUpModal
+        visible={calendarModalVisible}
+        onClose={closeModal}
+        title={modalTitle}>
+        <DatePicker
+          date={date}
+          onDateChange={setDate}
+          theme="light"
+          minimumDate={new Date()}
+        />
+        <TouchableOpacity style={styles.actionButton} onPress={handleSaveDate}>
+          <Text style={styles.actionText}>Save</Text>
+        </TouchableOpacity>
+      </SlideUpModal>
+
+      {/* Custom Alert */}
+      <CustomAlert message={alertMessage} visible={alertVisible} />
     </View>
   );
 };
@@ -171,7 +237,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.xs,
     marginBottom: hp(1.5),
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
@@ -184,9 +250,6 @@ const styles = StyleSheet.create({
     fontWeight: weight.regular,
     color: 'rgba(0,0,0,0.5)',
   },
-  confirmButton: {
-    backgroundColor: colors.primary,
-  },
   input: {
     borderWidth: 1,
     borderColor: colors.primaryColor60,
@@ -196,7 +259,7 @@ const styles = StyleSheet.create({
     width: wp(90),
   },
   actionButton: {
-    backgroundColor: colors.primaryDark,
+    backgroundColor: colors.primary,
     padding: wp(3),
     borderRadius: radius.xs,
     marginVertical: hp(1),

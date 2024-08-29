@@ -31,6 +31,8 @@ import HeartAddIcon from './HeartAddIcon';
 import HeartCheckIcon from './HeartCheckIcon';
 import HeadingIcon from './HeadingIcon';
 import ParagraphIcon from './ParagraphIcon';
+import Camera01Icon from './Camera01Icon';
+import GooglePhotosIcon from './GooglePhotosIcon';
 
 const icons = {
   home: Home01Icon,
@@ -62,6 +64,8 @@ const icons = {
   heartCheck: HeartCheckIcon,
   heading: HeadingIcon,
   paragraph: ParagraphIcon,
+  camera: Camera01Icon,
+  googlePhotos: GooglePhotosIcon,
 };
 
 const HugeIcon = ({name, ...props}) => {

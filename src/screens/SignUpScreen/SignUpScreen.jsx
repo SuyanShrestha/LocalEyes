@@ -21,26 +21,31 @@ import BackButton from '../../components/BackButton/BackButton';
 import HugeIcon from '../../assets/icons';
 import weight from '../../constants/weight';
 import ActionButton from '../../components/ActionButton/ActionButton';
+import LottieComponent from '../../components/LottieComponent/LottieComponent';
+import {RegisterLottie} from '../../assets/lottie';
+import CustomAlert from '../../components/CustomAlert/CustomAlert';
 
 const SignUpScreen = ({navigation}) => {
   const nameRef = useRef('');
   const emailRef = useRef('');
   const passwordRef = useRef('');
   const [loading, setLoading] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
   const {register} = useContext(AuthContext);
 
   const onSubmit = async () => {
     if (!nameRef.current || !emailRef.current || !passwordRef.current) {
-      Alert.alert('Sign up', 'Please fill all the fields');
+      setAlertMessage('Please fill all the fields');
+      setAlertVisible(true);
+      setTimeout(() => setAlertVisible(false), 2000);
       return;
     }
     try {
       await register(nameRef.current, emailRef.current, passwordRef.current);
-      Alert.alert('Sign up', 'Registration successful');
       navigation.navigate('Dashboard');
     } catch (error) {
-      Alert.alert('Sign up', 'Registration failed');
       console.log(error);
     }
   };
@@ -49,7 +54,6 @@ const SignUpScreen = ({navigation}) => {
     <ScreenWrapper bg={colors.secondaryColor30}>
       <View style={styles.container}>
         <View style={styles.topSection}>
-          <BackButton navigation={navigation} />
           <View style={styles.logoDiv}>
             <Image
               source={require('../../assets/logo/logo5.jpg')}
@@ -83,19 +87,6 @@ const SignUpScreen = ({navigation}) => {
             onChangeText={value => (passwordRef.current = value)}
           />
           <ActionButton onPress={onSubmit} buttonText="Sign Up" />
-          {/* <Text style={{ color: colors.primaryDark }}>or</Text> */}
-          <ActionButton
-            onPress={() => {}}
-            buttonText="Continue with Google"
-            backgroundColor="transparent"
-            textColor={colors.roseLight}
-          />
-          <ActionButton
-            onPress={() => {}}
-            buttonText="Continue with Facebook"
-            backgroundColor="transparent"
-            textColor={colors.roseLight}
-          />
         </View>
 
         {/* Footer */}
@@ -112,12 +103,19 @@ const SignUpScreen = ({navigation}) => {
             </Text>
           </Pressable>
         </View>
-        <ActionButton
-          onPress={() => navigation.navigate('Dashboard')}
-          buttonText="Go to Dashboard"
-          backgroundColor="transparent"
-          textColor={colors.roseLight}
-        />
+
+        {/* remaining section */}
+        <View style={styles.lottieContainer}>
+          <LottieComponent
+            animationData={RegisterLottie}
+            width={wp(100)}
+            height={wp(50)}
+          />
+        </View>
+
+
+        {/* Custom Alert */}
+        <CustomAlert message={alertMessage} visible={alertVisible} />
       </View>
     </ScreenWrapper>
   );
@@ -135,7 +133,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
   },
   logoDiv: {
     backgroundColor: 'rgba(0, 0, 0, 0.07)',
@@ -168,5 +166,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colors.text,
     fontSize: hp(1.6),
+  },
+  lottieContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: hp(10),
   },
 });
