@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "152880184434",
+    "project_id": "localeyes-4811b",
+    "storage_bucket": "localeyes-4811b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:152880184434:android:9d11b9b87dc4f05bc0d6eb",
+        "android_client_info": {
+          "package_name": "com.localeyes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4N0MJ9pvrmMkbF7ooIHxZB_-YlaINdM4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
