@@ -121,6 +121,12 @@ const OrdersScreen = () => {
         });
       });
 
+      setAlertMessage('Rating submitted successfully.');
+      setAlertVisible(true);
+      setTimeout(() => {
+        setAlertVisible(false);
+      }, 2000);
+
       handleDelete(selectedOrder.id);
     } catch (error) {
       console.error('Error updating rating:', error);

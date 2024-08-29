@@ -50,7 +50,7 @@ const LoginScreen = ({navigation}) => {
         <View style={styles.topSection}>
           <View style={styles.logoDiv}>
             <Image
-              source={require('../../assets/logo/logo5.jpg')}
+              source={require('../../assets/logo/mainlogo.jpg')}
               style={styles.logo}
             />
           </View>

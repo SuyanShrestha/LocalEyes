@@ -67,7 +67,7 @@ const Contact = ({navigation}) => {
                 <HugeIcon
                   name="phone"
                   strokeWidth={2.5}
-                  color={colors.textDark}
+                  color={colors.text}
                 />
               </TouchableOpacity>
               <Text>+977 9861609800</Text>
@@ -79,7 +79,7 @@ const Contact = ({navigation}) => {
                 <HugeIcon
                   name="mail"
                   strokeWidth={2.5}
-                  color={colors.textDark}
+                  color={colors.text}
                 />
               </TouchableOpacity>
               <Text>sh.suyan16@gmail.com</Text>
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   secondContainerContent: {
-    height: hp(75),
+    height: '100%',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-evenly',
