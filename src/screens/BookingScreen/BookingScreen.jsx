@@ -83,6 +83,12 @@ const BookingScreen = ({navigation, route}) => {
   };
 
   const handleConfirmOrder = async () => {
+
+    if (!appointmentDate) {
+      alert('Please select an appointment date.');
+      return;
+    }
+    
     try {
       const bookingRef = firestore().collection('bookings').doc();
       await bookingRef.set({

@@ -8,13 +8,10 @@ const colors = {
   text: '#494949',
   textLight: '#7C7C7C',
   textDark: '#1D1D1D',
-  rose: '#EF4444',
-  roseLight: '#F87171',
 
   primaryColor60: '#F3F5FD',
   secondaryColor30: '#FFFFFF',
   actionButtonColor10: '#009B58'
-
 };
 
 export default colors;

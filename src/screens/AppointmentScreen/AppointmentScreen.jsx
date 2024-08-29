@@ -34,7 +34,6 @@ const AppointmentScreen = () => {
           ...doc.data(),
         }));
         setAppointments(fetchedAppointments);
-        // console.log(fetchedAppointments);
       });
 
     // Clean up the listener on unmount

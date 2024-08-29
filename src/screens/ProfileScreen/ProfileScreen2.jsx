@@ -20,6 +20,9 @@ import {AuthContext} from '../../navigation/AuthProvider';
 import SlideUpModal from '../../components/SlideUpModal/SlideUpModal';
 import {categories} from '../../constants/categories';
 
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import storage from '@react-native-firebase/storage';
+
 const ProfileScreen2 = ({route, navigation}) => {
   // const [ownProfile, setOwnProfile] = useState(true);
   const [ownProfile, setOwnProfile] = useState(
@@ -28,10 +31,15 @@ const ProfileScreen2 = ({route, navigation}) => {
   const [provider, setProvider] = useState(route.params?.provider ?? true);
   const [profileDetails, setProfileDetails] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [cameraModalVisible, setCameraModalVisible] = useState(false);
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
   const [inputValue, setInputValue] = useState('');
   const [fieldToEdit, setFieldToEdit] = useState('');
   const {user, logout} = useContext(AuthContext);
+
+  const [imageData, setImageData] = useState(null);
+  const [imageUrl, setImageUrl] = useState('');
 
   const [favouriteIcon, setFavouriteIcon] = useState('heartAdd');
   const [favourites, setFavourites] = useState([]);
@@ -81,7 +89,6 @@ const ProfileScreen2 = ({route, navigation}) => {
       docSnapshot => {
         if (docSnapshot.exists) {
           const data = docSnapshot.data();
-          // console.log(docSnapshot, data);
           if (data) {
             setFavourites(data.favourites || []);
             if (data.favourites && data.favourites.includes(provider.id)) {
@@ -102,6 +109,73 @@ const ProfileScreen2 = ({route, navigation}) => {
     // Clean up the listener on component unmount
     return () => unsubscribe();
   }, [user.uid, provider.id]);
+
+  // for fetching profile pic
+  useEffect(() => {
+    const idToUse = ownProfile ? user.uid : provider.id;
+
+    const unsubscribe = firestore()
+      .collection('users')
+      .doc(idToUse)
+      .onSnapshot(
+        doc => {
+          if (doc.exists) {
+            const profileData = doc.data();
+            setImageUrl(profileData.profilePic);
+          } else {
+            console.log('Document does not exist');
+          }
+        },
+        error => {
+          console.error('Error fetching profile pic: ', error);
+        },
+      );
+
+    // Clean up the listener on component unmount
+    return () => unsubscribe();
+  }, [ownProfile, user, provider]);
+
+  // for profile pic
+  const handleImageResult = result => {
+    if (result.didCancel) {
+      setImageData(null);
+    } else if (result.errorCode) {
+      console.error('ImagePicker Error: ', result.errorMessage);
+      setImageData(null);
+    } else {
+      setImageData(result);
+    }
+  };
+
+  // for camera profile pic
+  const openCamera = async () => {
+    const result = await launchCamera({mediaType: 'photo'});
+    handleImageResult(result);
+  };
+
+  // for gallery profile pic
+  const openGallery = async () => {
+    const result = await launchImageLibrary({mediaType: 'photo'});
+    handleImageResult(result);
+  };
+
+  const uploadImage = async () => {
+    try {
+      const reference = storage().ref(imageData.assets[0].fileName);
+      const pathToFile = imageData.assets[0].uri;
+      await reference.putFile(pathToFile);
+
+      const url = await storage()
+        .ref(imageData.assets[0].fileName)
+        .getDownloadURL();
+
+      await firestore().collection('users').doc(user.uid).update({
+        profilePic: url,
+      });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    }
+  };
 
   const getCategoryName = categoryID => {
     const category = categories.find(cat => cat.id === categoryID);
@@ -124,6 +198,23 @@ const ProfileScreen2 = ({route, navigation}) => {
 
   const closeModal = () => {
     setModalVisible(false);
+    setCameraModalVisible(false);
+    setLogoutModalVisible(false);
+  };
+
+  const openCameraModal = title => {
+    setModalTitle(title);
+    setCameraModalVisible(true);
+  };
+
+  const openLogoutModal = title => {
+    setModalTitle(title);
+    setLogoutModalVisible(true);
+  };
+
+  const handleCameraSave = () => {
+    uploadImage();
+    closeModal();
   };
 
   const handleSave = async () => {
@@ -143,8 +234,6 @@ const ProfileScreen2 = ({route, navigation}) => {
               : detail,
           ),
         );
-
-        console.log('Profile updated successfully');
       }
     } catch (error) {
       console.error('Error updating profile: ', error);
@@ -155,7 +244,7 @@ const ProfileScreen2 = ({route, navigation}) => {
   // handling booking
   const handleBooking = () => {
     navigation.navigate('BookingScreen', {provider: provider});
-  }
+  };
 
   // adding and removing favourites
   const handleFavourite = async () => {
@@ -200,13 +289,19 @@ const ProfileScreen2 = ({route, navigation}) => {
         {ownProfile ? (
           <View style={styles.profileContent}>
             {/* Profile Picture */}
-            <TouchableOpacity style={styles.imageDiv}>
-              <Image
-                style={styles.userImg}
-                source={{
-                  uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRooEnD32-UtBw55GBfDTxxUZApMhWWnRaoLw&s',
-                }}
-              />
+            <TouchableOpacity
+              style={styles.imageDiv}
+              onPress={() => openCameraModal('Profile Picture')}>
+              {imageUrl ? (
+                <Image source={{uri: imageUrl}} style={styles.userImg} />
+              ) : (
+                <Image
+                  style={styles.userImg}
+                  source={{
+                    uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRooEnD32-UtBw55GBfDTxxUZApMhWWnRaoLw&s',
+                  }}
+                />
+              )}
             </TouchableOpacity>
 
             <View style={styles.contentSection}>
@@ -261,7 +356,7 @@ const ProfileScreen2 = ({route, navigation}) => {
             {/* Logout button */}
             <TouchableOpacity
               style={styles.actionButton}
-              onPress={() => logout()}>
+              onPress={() => openLogoutModal('Come back soon!')}>
               <Text style={styles.actionText}>Logout</Text>
             </TouchableOpacity>
           </View>
@@ -270,16 +365,22 @@ const ProfileScreen2 = ({route, navigation}) => {
           <View style={styles.profileContent}>
             {/* Profile Picture */}
             <View style={styles.imageDiv}>
-              <Image
-                style={styles.userImg}
-                source={{
-                  uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRooEnD32-UtBw55GBfDTxxUZApMhWWnRaoLw&s',
-                }}
-              />
+              {imageUrl ? (
+                <Image source={{uri: imageUrl}} style={styles.userImg} />
+              ) : (
+                <Image
+                  style={styles.userImg}
+                  source={{
+                    uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRooEnD32-UtBw55GBfDTxxUZApMhWWnRaoLw&s',
+                  }}
+                />
+              )}
             </View>
 
             <View style={styles.buttonsContainer}>
-              <TouchableOpacity style={styles.buttonContainer} onPress={handleBooking}>
+              <TouchableOpacity
+                style={styles.buttonContainer}
+                onPress={handleBooking}>
                 <HugeIcon
                   name="userAdd"
                   size={26}
@@ -353,6 +454,71 @@ const ProfileScreen2 = ({route, navigation}) => {
         )}
         <TouchableOpacity style={styles.actionButton} onPress={handleSave}>
           <Text style={styles.actionText}>Save</Text>
+        </TouchableOpacity>
+      </SlideUpModal>
+
+      <SlideUpModal
+        visible={cameraModalVisible}
+        onClose={closeModal}
+        title={modalTitle}>
+        {/* image */}
+        <View style={styles.modalProfilePicDiv}>
+          {imageData ? (
+            <Image
+              source={{uri: imageData.assets[0].uri}}
+              style={styles.modalProfilePic}
+            />
+          ) : (
+            <Image
+              source={{
+                uri: imageUrl,
+              }}
+              style={styles.modalProfilePic}
+            />
+          )}
+        </View>
+        <View style={styles.profilePicEditButtons}>
+          <TouchableOpacity
+            onPress={() => {
+              openCamera();
+            }}
+            style={styles.profilePicEditButton}>
+            <HugeIcon name="camera" size={25} strokeWidth={1.5} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => {
+              openGallery();
+            }}
+            style={styles.profilePicEditButton}>
+            <HugeIcon name="googlePhotos" size={25} strokeWidth={1.5} />
+          </TouchableOpacity>
+        </View>
+
+        {/* save button */}
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => {
+            handleCameraSave();
+          }}>
+          <Text style={styles.actionText}>Save</Text>
+        </TouchableOpacity>
+      </SlideUpModal>
+
+      {/* logout modal */}
+      <SlideUpModal
+        visible={logoutModalVisible}
+        onClose={closeModal}
+        title={modalTitle}>
+        <Text style={styles.subtitle}>Are you sure you want to logout?</Text>
+        <TouchableOpacity onPress={logout} style={styles.actionButton}>
+          <Text style={styles.actionText}> Yes, Logout.</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={closeModal}>
+          <Text style={[styles.actionText, styles.cancelButtonText]}>
+            {' '}
+            Cancel.
+          </Text>
         </TouchableOpacity>
       </SlideUpModal>
     </View>
@@ -445,7 +611,7 @@ const styles = StyleSheet.create({
   },
   actionText: {
     fontSize: hp(2.25),
-    fontWeight: weight.bold,
+    fontWeight: weight.medium,
     color: colors.secondaryColor30,
     textAlign: 'center',
   },
@@ -480,6 +646,39 @@ const styles = StyleSheet.create({
   },
   addButton: {
     color: colors.text,
+  },
+  modalProfilePicDiv: {
+    backgroundColor: 'rgba(0,0,0,0.08)',
+    padding: 4,
+    borderRadius: 75,
+    alignSelf: 'center',
+  },
+  modalProfilePic: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    alignSelf: 'center',
+  },
+  profilePicEditButtons: {
+    flexDirection: 'row',
+    justifyContent:'space-around',
+    marginVertical: 10,
+    paddingHorizontal: wp(5),
+  },
+  profilePicEditButton: {
+    backgroundColor: 'rgba(0,0,0,0.08)',
+    padding: 8,
+    borderRadius: 75,
+    marginBottom: 10,
+    alignSelf: 'center',
+  },
+  subtitle: {
+    color: '#999',
+    marginBottom: 10,
+  },
+  cancelButtonText: {
+    color: colors.primaryDark,
+    marginTop: 6,
   },
 });
 
