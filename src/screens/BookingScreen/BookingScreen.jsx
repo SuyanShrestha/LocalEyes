@@ -17,6 +17,7 @@ import SlideUpModal from '../../components/SlideUpModal/SlideUpModal';
 import {AuthContext} from '../../navigation/AuthProvider';
 import firestore from '@react-native-firebase/firestore';
 import DatePicker from 'react-native-date-picker';
+import CustomAlert from '../../components/CustomAlert/CustomAlert';
 
 const BookingScreen = ({navigation, route}) => {
   const {provider} = route.params;
@@ -29,15 +30,16 @@ const BookingScreen = ({navigation, route}) => {
 
   const {user} = useContext(AuthContext);
 
-  const [heading, setHeading] = useState('Add heading');
-  const [paragraph, setParagraph] = useState('Add paragraph');
-  const [location, setLocation] = useState('Add location');
+  const [heading, setHeading] = useState('Title');
+  const [paragraph, setParagraph] = useState('Description');
+  const [location, setLocation] = useState('Location');
   const [calendar, setCalendar] = useState(null);
   const [appointmentDate, setAppointmentDate] = useState(null);
 
-  const formattedDate = calendar
-    ? calendar.toLocaleDateString()
-    : 'Add datetime';
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+
+  const formattedDate = calendar ? calendar.toLocaleDateString() : 'Datetime';
 
   const [date, setDate] = useState(new Date());
 
@@ -83,12 +85,13 @@ const BookingScreen = ({navigation, route}) => {
   };
 
   const handleConfirmOrder = async () => {
-
     if (!appointmentDate) {
-      alert('Please select an appointment date.');
+      setAlertMessage('Please select an appointment date');
+      setAlertVisible(true);
+      setTimeout(() => setAlertVisible(false), 2000);
       return;
     }
-    
+
     try {
       const bookingRef = firestore().collection('bookings').doc();
       await bookingRef.set({
@@ -100,11 +103,19 @@ const BookingScreen = ({navigation, route}) => {
         appointmentDate: firestore.Timestamp.fromDate(appointmentDate),
         createdAt: firestore.FieldValue.serverTimestamp(),
       });
-      alert('Booking confirmed!');
-      navigation.navigate('HomeScreen');
+      setAlertMessage('Booking confirmed!');
+      setAlertVisible(true);
+
+      setTimeout(() => {
+        setAlertVisible(false);
+        navigation.navigate('HomeScreen');
+      }, 1000);
+
     } catch (error) {
       console.error('Error adding document: ', error);
-      alert('Error confirming booking. Please try again.');
+      setAlertMessage('Error confirming booking. Please try again.');
+      setAlertVisible(true);
+      setTimeout(() => setAlertVisible(false), 2000);
     }
   };
 
@@ -185,6 +196,9 @@ const BookingScreen = ({navigation, route}) => {
           <Text style={styles.actionText}>Save</Text>
         </TouchableOpacity>
       </SlideUpModal>
+
+      {/* Custom Alert */}
+      <CustomAlert message={alertMessage} visible={alertVisible} />
     </View>
   );
 };

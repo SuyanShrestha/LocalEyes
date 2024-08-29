@@ -10,7 +10,7 @@ const ActionButton = ({buttonText, onPress, backgroundColor, textColor}) => {
       onPress={onPress}
       style={[
         styles.container,
-        {backgroundColor: backgroundColor || colors.actionButtonColor10},
+        {backgroundColor: backgroundColor || colors.primaryDark},
       ]}>
       <Text
         style={[
@@ -27,7 +27,7 @@ export default ActionButton;
 
 const styles = StyleSheet.create({
   container: {
-    height: hp(4.2),
+    height: hp(4),
     width: '100%',
     display: 'flex',
     alignItems: 'center',

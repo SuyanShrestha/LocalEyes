@@ -21,27 +21,33 @@ import HugeIcon from '../../assets/icons';
 import weight from '../../constants/weight';
 import ActionButton from '../../components/ActionButton/ActionButton';
 
-import { AuthContext } from '../../navigation/AuthProvider';
-
+import {AuthContext} from '../../navigation/AuthProvider';
+import LottieComponent from '../../components/LottieComponent/LottieComponent';
+import {LoginLottie} from '../../assets/lottie';
+import CustomAlert from '../../components/CustomAlert/CustomAlert';
 
 const LoginScreen = ({navigation}) => {
   const emailRef = useRef('');
   const passwordRef = useRef('');
   const [loading, setLoading] = useState(false);
-  const { login } = useContext(AuthContext);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const {login} = useContext(AuthContext);
 
   const onSubmit = async () => {
     if (!emailRef.current || !passwordRef.current) {
-      Alert.alert('Login', 'Please fill all the fields');
+      setAlertMessage('Please fill all the fields');
+      setAlertVisible(true);
+      setTimeout(() => setAlertVisible(false), 2000);
       return;
     }
-    login(emailRef.current, passwordRef.current)
+    login(emailRef.current, passwordRef.current);
   };
+
   return (
     <ScreenWrapper bg={colors.secondaryColor30}>
       <View style={styles.container}>
         <View style={styles.topSection}>
-          <BackButton navigation={navigation} />
           <View style={styles.logoDiv}>
             <Image
               source={require('../../assets/logo/logo5.jpg')}
@@ -71,19 +77,6 @@ const LoginScreen = ({navigation}) => {
           />
           <View style={styles.socialDiv}>
             <ActionButton onPress={onSubmit} buttonText="Sign In" />
-            <Text style={{color: colors.primaryDark}}>or</Text>
-            <ActionButton
-              onPress={() => {}}
-              buttonText="Continue with Google"
-              backgroundColor="transparent"
-              textColor={colors.roseLight}
-            />
-            <ActionButton
-              onPress={() => {}}
-              buttonText="Continue with Facebook"
-              backgroundColor="transparent"
-              textColor={colors.roseLight}
-            />
           </View>
         </View>
 
@@ -101,12 +94,18 @@ const LoginScreen = ({navigation}) => {
             </Text>
           </Pressable>
         </View>
-        <ActionButton
-          onPress={() => navigation.navigate('Dashboard')}
-          buttonText="Go to Dashboard"
-          backgroundColor="transparent"
-          textColor={colors.roseLight}
-        />
+
+        {/* remaining section */}
+        <View style={styles.lottieContainer}>
+          <LottieComponent
+            animationData={LoginLottie}
+            width={wp(100)}
+            height={wp(75)}
+          />
+        </View>
+
+        {/* Custom Alert */}
+        <CustomAlert message={alertMessage} visible={alertVisible} />
       </View>
     </ScreenWrapper>
   );
@@ -124,7 +123,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
   },
   logoDiv: {
     backgroundColor: 'rgba(0, 0, 0, 0.07)',
@@ -169,5 +168,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colors.text,
     fontSize: hp(1.6),
+  },
+  lottieContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: hp(10),
   },
 });

@@ -20,6 +20,7 @@ import LottieComponent from '../../components/LottieComponent/LottieComponent';
 import {AuthContext} from '../../navigation/AuthProvider';
 import moment from 'moment';
 import {Rating} from 'react-native-ratings';
+import CustomAlert from '../../components/CustomAlert/CustomAlert';
 
 const OrdersScreen = () => {
   const [orders, setOrders] = useState([]);
@@ -34,8 +35,8 @@ const OrdersScreen = () => {
   const [phone, setPhone] = useState('');
 
   const {user} = useContext(AuthContext);
-
-  
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
   useEffect(() => {
     const unsubscribe = firestore()
@@ -132,7 +133,11 @@ const OrdersScreen = () => {
     if (phone) {
       Linking.openURL(`tel:${phone}`);
     } else {
-      console.warn('Phone number not available');
+      setAlertMessage('Phone number not available');
+      setAlertVisible(true);
+      setTimeout(() => {
+        setAlertVisible(false);
+      }, 2000);
     }
   };
 
@@ -272,6 +277,9 @@ const OrdersScreen = () => {
           <Text style={styles.submitButtonText}>Submit Rating</Text>
         </TouchableOpacity>
       </SlideUpModal>
+
+      {/* Custom Alert */}
+      <CustomAlert message={alertMessage} visible={alertVisible} />
     </View>
   );
 };

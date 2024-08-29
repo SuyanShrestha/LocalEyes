@@ -511,7 +511,7 @@ const ProfileScreen2 = ({route, navigation}) => {
         onClose={closeModal}
         title={modalTitle}>
         <Text style={styles.subtitle}>Are you sure you want to logout?</Text>
-        <TouchableOpacity onPress={logout} style={styles.actionButton}>
+        <TouchableOpacity onPress={() => logout()} style={styles.actionButton}>
           <Text style={styles.actionText}> Yes, Logout.</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={closeModal}>
