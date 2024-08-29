@@ -10,6 +10,9 @@ import {hp, wp} from '../../helpers/common';
 import {AuthContext} from '../../navigation/AuthProvider';
 import firestore from '@react-native-firebase/firestore';
 import moment from 'moment';
+import {EmptyLottie} from '../../assets/lottie';
+import LottieComponent from '../../components/LottieComponent/LottieComponent';
+import CustomAlert from '../../components/CustomAlert/CustomAlert';
 
 const AppointmentScreen = () => {
   // const [appointments, setAppointments] = useState(initialAppointments);
@@ -17,8 +20,11 @@ const AppointmentScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const [appointments, setAppointments] = useState([]);
-  const [appointmentDate, setAppointmentDate] = useState('');
+  const [appointmentDate, setAppointmentDate] = useState(null);
   const [username, setUsername] = useState('');
+
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
   const {user} = useContext(AuthContext);
 
@@ -44,6 +50,7 @@ const AppointmentScreen = () => {
     const unsubscribe = bookingRef.onSnapshot(async doc => {
       if (doc.exists) {
         const bookingData = doc.data();
+        console.log(bookingData);
 
         try {
           // adding booking data to the orders collection
@@ -53,20 +60,34 @@ const AppointmentScreen = () => {
             providerID: bookingData.providerID,
             heading: bookingData.heading,
             paragraph: bookingData.paragraph,
+            appointmentDate: bookingData.appointmentDate,
             createdAt: firestore.FieldValue.serverTimestamp(),
           });
 
           // deleting the accepted booking from the bookings collection
           await bookingRef.delete();
 
-          alert('Order has been accepted and moved to orders!');
+          setAlertMessage(
+            'Order has been accepted and moved to customer screens!',
+          );
+          setAlertVisible(true);
+          setTimeout(() => {
+            setAlertVisible(false);
+          }, 2000);
           unsubscribe();
         } catch (error) {
-          console.error('Error processing order: ', error);
-          alert('Error accepting the booking. Please try again.');
+          setAlertMessage('Error accepting the booking. Please try again.');
+          setAlertVisible(true);
+          setTimeout(() => {
+            setAlertVisible(false);
+          }, 2000);
         }
       } else {
-        alert('Booking not found!');
+        setAlertMessage('Booking not found.');
+        setAlertVisible(true);
+        setTimeout(() => {
+          setAlertVisible(false);
+        }, 2000);
         unsubscribe();
       }
     });
@@ -79,6 +100,11 @@ const AppointmentScreen = () => {
     setAppointments(prevAppointments =>
       prevAppointments.filter(appointment => appointment.id !== id),
     );
+    setAlertMessage('Booking rejected successfully.');
+    setAlertVisible(true);
+    setTimeout(() => {
+      setAlertVisible(false);
+    }, 2000);
     closeModal();
   };
 
@@ -132,11 +158,24 @@ const AppointmentScreen = () => {
 
       {/* List section */}
       <View style={styles.secondSection}>
-        <FlatList
-          data={appointments}
-          renderItem={renderItem}
-          keyExtractor={item => item.id.toString()}
-        />
+        {appointments.length > 0 ? (
+          <FlatList
+            data={appointments}
+            renderItem={renderItem}
+            keyExtractor={item => item.id.toString()}
+          />
+        ) : (
+          <View style={styles.emptyState}>
+            <LottieComponent
+              animationData={EmptyLottie}
+              width={wp(100)}
+              height={wp(100)}
+            />
+            <Text style={styles.noAppointmentsText}>
+              No appointments found.
+            </Text>
+          </View>
+        )}
       </View>
 
       {/* Modal section */}
@@ -175,6 +214,14 @@ const AppointmentScreen = () => {
               <Text style={styles.messageText}>{selectedOrder.location}</Text>
             </View>
 
+            {/* calendar */}
+            <View style={styles.messageRow}>
+              <HugeIcon name="calendar" size={25} strokeWidth={1.5} />
+              <Text style={styles.messageText}>
+                {selectedOrder.appointmentDate.toDate().toLocaleString()}
+              </Text>
+            </View>
+
             {/* heading */}
             <View style={styles.messageRow}>
               <HugeIcon name="heading" size={25} strokeWidth={1.5} />
@@ -202,6 +249,9 @@ const AppointmentScreen = () => {
           </View>
         </SlideUpModal>
       )}
+
+      {/* Custom Alert */}
+      <CustomAlert message={alertMessage} visible={alertVisible} />
     </View>
   );
 };
@@ -263,6 +313,17 @@ const styles = StyleSheet.create({
   secondSection: {
     marginHorizontal: wp(4),
     marginBottom: hp(10),
+  },
+  emptyState: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noAppointmentsText: {
+    fontSize: hp(2),
+    fontWeight: weight.medium,
+    color: colors.text,
+    marginTop: hp(2),
   },
   messageContent: {
     marginVertical: 8,
