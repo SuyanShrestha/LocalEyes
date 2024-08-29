@@ -1,14 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React from 'react';
+import Providers from './src/navigation';
 
 const App = () => {
-  return (
-    <View>
-      <Text>App</Text>
-    </View>
-  )
-}
+  return <Providers />;
+};
 
-export default App
-
-const styles = StyleSheet.create({})
+export default App;
