@@ -64,7 +64,7 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.nameContainer}>
           <View style={styles.logoDiv}>
             <Image
-              source={require('../../assets/logo/logo5.jpg')}
+              source={require('../../assets/logo/mainlogo_bgless.jpg')}
               style={styles.logo}
             />
           </View>

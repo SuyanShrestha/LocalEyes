@@ -37,6 +37,5 @@ const styles = StyleSheet.create({
     borderRadius: radius.xxl,
     borderCurve: 'continuous',
   },
-  buttonText: {
-  },
+  buttonText: {},
 });

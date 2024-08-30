@@ -22,6 +22,7 @@ import {categories} from '../../constants/categories';
 
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
+import CustomAlert from '../../components/CustomAlert/CustomAlert';
 
 const ProfileScreen2 = ({route, navigation}) => {
   // const [ownProfile, setOwnProfile] = useState(true);
@@ -43,6 +44,10 @@ const ProfileScreen2 = ({route, navigation}) => {
 
   const [favouriteIcon, setFavouriteIcon] = useState('heartAdd');
   const [favourites, setFavourites] = useState([]);
+
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [initialFetchDone, setInitialFetchDone] = useState(false);
 
   // for getting user details
   useEffect(() => {
@@ -219,6 +224,11 @@ const ProfileScreen2 = ({route, navigation}) => {
 
   const handleSave = async () => {
     try {
+      // validation for phone number
+      if (fieldToEdit === 'phone' && !isValidPhoneNumber(inputValue)) {
+        handleCustomAlerts('Please enter a valid 10-digit phone number.');
+        return;
+      }
       if (user) {
         await firestore()
           .collection('users')
@@ -234,12 +244,28 @@ const ProfileScreen2 = ({route, navigation}) => {
               : detail,
           ),
         );
+
+        handleCustomAlerts('Updated successfully.')
       }
     } catch (error) {
       console.error('Error updating profile: ', error);
     }
     closeModal();
   };
+
+  const isValidPhoneNumber = phoneNumber => {
+    const phoneRegex = /^\d{10}$/;
+    return phoneRegex.test(phoneNumber);
+  };
+
+  // handling custom alerts
+  const handleCustomAlerts = (msg) => {
+    setAlertMessage(msg);
+    setAlertVisible(true);
+    setTimeout(() => {
+      setAlertVisible(false);
+    }, 2000);
+  } 
 
   // handling booking
   const handleBooking = () => {
@@ -253,9 +279,15 @@ const ProfileScreen2 = ({route, navigation}) => {
         .collection('favourites')
         .doc(user.uid);
 
-      const updatedFavourites = favourites.includes(provider.id)
-        ? favourites.filter(id => id !== provider.id)
-        : [...favourites, provider.id];
+        const isFavourite = favourites.includes(provider.id);
+
+        // Update favourites
+        const updatedFavourites = isFavourite
+          ? favourites.filter(id => id !== provider.id)
+          : [...favourites, provider.id];
+        
+        // custom alert accordingly
+        handleCustomAlerts(isFavourite ? 'Removed from favourites' : 'Added to favourites');
 
       await favouritesDocRef.set(
         {
@@ -264,6 +296,8 @@ const ProfileScreen2 = ({route, navigation}) => {
         },
         {merge: true},
       );
+
+
     } catch (error) {
       console.error('Error updating favourites:', error);
     }
@@ -298,21 +332,21 @@ const ProfileScreen2 = ({route, navigation}) => {
                 <Image
                   style={styles.userImg}
                   source={{
-                    uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRooEnD32-UtBw55GBfDTxxUZApMhWWnRaoLw&s',
+                    uri: 'https://firebasestorage.googleapis.com/v0/b/localeyes-4811b.appspot.com/o/mainlogo.jpg?alt=media&token=cc1d2f45-5ec5-486e-a16a-0053dbd31597',
                   }}
                 />
               )}
             </TouchableOpacity>
 
             <View style={styles.contentSection}>
-              <TouchableOpacity style={styles.detailItem}>
+              <TouchableOpacity style={styles.detailItem} onPress={() => handleCustomAlerts('Username can only be set once.')}>
                 <Text style={styles.fieldName}>Name</Text>
                 <Text style={styles.fieldValue}>
                   {profileDetails.find(item => item.field === 'Name')?.value ||
                     'Not Available'}
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.detailItem}>
+              <TouchableOpacity style={styles.detailItem} onPress={() => handleCustomAlerts('Email can only be set once.')}>
                 <Text style={styles.fieldName}>Email</Text>
                 <Text style={styles.fieldValue}>
                   {profileDetails.find(item => item.field === 'Email')?.value ||
@@ -371,7 +405,7 @@ const ProfileScreen2 = ({route, navigation}) => {
                 <Image
                   style={styles.userImg}
                   source={{
-                    uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRooEnD32-UtBw55GBfDTxxUZApMhWWnRaoLw&s',
+                    uri: 'https://firebasestorage.googleapis.com/v0/b/localeyes-4811b.appspot.com/o/mainlogo.jpg?alt=media&token=cc1d2f45-5ec5-486e-a16a-0053dbd31597',
                   }}
                 />
               )}
@@ -457,6 +491,7 @@ const ProfileScreen2 = ({route, navigation}) => {
         </TouchableOpacity>
       </SlideUpModal>
 
+      {/* slideup modal for profile pic */}
       <SlideUpModal
         visible={cameraModalVisible}
         onClose={closeModal}
@@ -521,6 +556,9 @@ const ProfileScreen2 = ({route, navigation}) => {
           </Text>
         </TouchableOpacity>
       </SlideUpModal>
+
+      {/* Custom Alert */}
+      <CustomAlert message={alertMessage} visible={alertVisible} />
     </View>
   );
 };
@@ -661,7 +699,7 @@ const styles = StyleSheet.create({
   },
   profilePicEditButtons: {
     flexDirection: 'row',
-    justifyContent:'space-around',
+    justifyContent: 'space-around',
     marginVertical: 10,
     paddingHorizontal: wp(5),
   },

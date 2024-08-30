@@ -1,79 +1,118 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# LocalEyes
 
-# Getting Started
+**LocalEyes** is a React Native application designed to connect users with trusted local service providers such as plumbers, electricians, tutors, and more. Built on community-generated insights, LocalEyes ensures that users can find service providers recommended by their neighbors, fostering trust and reliability within local communities.
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+## Table of Contents
 
-## Step 1: Start the Metro Server
+- [Proposal](#proposal)
+- [Features](#features)
+- [Packages and Libraries Used](#packages-and-libraries-used)
+- [Basic Workflow](#basic-workflow)
+- [Installation](#installation)
+- [Running the App](#running-the-app)
+- [Screenshots](#screenshots)
+- [Contact](#contact)
+- [Contributing](#contributing)
+- [License](#license)
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+## Proposal
 
-To start Metro, run the following command from the _root_ of your React Native project:
+In the initial version, LocalEyes will empower users to connect with local service providers—plumbers, electricians, tutors, and more—based on authentic, community-generated insights. This approach ensures that service providers are vetted and recommended by those who know them best—their neighbors. LocalEyes is built on the principle that the true quality of local services can only be seen through the eyes of other locals, fostering a community where trust and reliability are paramount.
 
-```bash
-# using npm
-npm start
+## Features
 
-# OR using Yarn
-yarn start
-```
+- **Category-Wise Providers**: Users can browse service providers categorized by their specific services.
+- **Favorites Screen**: Users can add or remove service providers from their favorites list for quick access.
+- **Appointments & Orders**: Users can book appointments and place orders with service providers.
+- **Profile Management**: Users can view and edit their profiles, manage orders, and more.
+- **Booking Flows**: Users can book a service, provide task details, select location, and choose date and time.
+- **Onboarding Screen**: A guided onboarding experience for first-time users.
+- **Firebase Authentication**: Secure user authentication using Firebase Auth.
+- **Firestore Integration**: Robust data handling using Firestore for service providers, orders, and reviews.
+- **Firebase Storage**: Handling image uploads for user profiles and service providers.
+- **Rate Service Providers**: Users can rate and review service providers after the service is completed.
+- **Review Management**: Track the number of ratings and reviews a provider has received.
 
-## Step 2: Start your Application
+## Packages and Libraries Used
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+- `@notifee/react-native`: Notifications handling.
+- `@react-native-async-storage/async-storage`: Local storage management.
+- `@react-native-firebase/app`: Firebase core module.
+- `@react-native-firebase/auth`: Firebase Authentication.
+- `@react-native-firebase/firestore`: Firestore database integration.
+- `@react-native-firebase/storage`: Firebase Storage for handling images.
+- `@react-native-seoul/masonry-list`: Masonry-style list layout.
+- `@react-navigation/bottom-tabs`: Bottom tab navigation.
+- `@react-navigation/drawer`: Drawer navigation.
+- `@react-navigation/native`: Core navigation functionality.
+- `@react-navigation/native-stack`: Native stack navigation.
+- `@react-navigation/stack`: Stack navigation.
+- `lottie-react-native`: Lottie animations integration.
+- `moment`: Date and time manipulation.
+- `react-native-date-picker`: Date picker component.
+- `react-native-gesture-handler`: Gesture handling.
+- `react-native-image-picker`: Image picker for selecting and uploading images.
+- `react-native-onboarding-swiper`: Onboarding swiper for initial user setup.
+- `react-native-ratings`: Star rating component.
+- `react-native-reanimated`: Advanced animations handling.
+- `react-native-safe-area-context`: Handling safe area views.
+- `react-native-screens`: Native screen optimizations.
+- `react-native-svg`: SVG support for React Native.
+- `react-native-svg-transformer`: SVG transformation.
+- `react-navigation`: Navigation package.
 
-### For Android
+## Basic Workflow
 
-```bash
-# using npm
-npm run android
+1. **Onboarding**: Displayed when the app is launched for the first time.
+2. **Authentication**: User can log in or register using Firebase Auth.
+3. **Home Screen**: Displays different service categories.
+4. **Provider Screen**: Shows all providers in the selected category.
+5. **Provider Profile**: Displays details of the selected provider, along with options to book services or add to favorites.
+6. **Booking Flow**: Users can provide task details, set location and date/time, and confirm the booking.
+7. **Appointment Management**: Providers can accept or reject appointments. Accepted bookings are added to the user's pending screen.
+8. **Pending Screen**: Displays pending orders. Users can rate the provider, call them directly, or delete the order.
+9. **Rating & Reviews**: Users can rate providers, updating their total reviews and ratings.
 
-# OR using Yarn
-yarn android
-```
+## Installation
 
-### For iOS
+### Prerequisites
 
-```bash
-# using npm
-npm run ios
+- Ensure you have [Node.js](https://nodejs.org/en/) and [React Native CLI](https://reactnative.dev/docs/environment-setup) installed on your system.
 
-# OR using Yarn
-yarn ios
-```
+### Steps
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/LocalEyes.git
+   cd LocalEyes
+2. Install the required dependencies:
+   npm install
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+### Screenshots
 
-## Step 3: Modifying your App
+Below are some screenshots showcasing the features of the LocalEyes app:
 
-Now that you have successfully run the app, let's modify it.
+<img src="src/assets/screenshots/1.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/2.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/3.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/4.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/5.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/6.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/7.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/8.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/9.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/10.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/11.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/12.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/13.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/14.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/15.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/16.jpg" alt="Screenshot" width="300"/>
 
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
+### Contact
+Email: sh.suyan16@gmail.com
+LinkedIn: Suyan Shrestha
+Twitter: @suyanshrestha
 
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+### Contributing
+If you would like to contribute to the project, please fork the repository and submit a pull request. Contributions are welcome!
