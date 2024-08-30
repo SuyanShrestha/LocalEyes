@@ -50,7 +50,6 @@ const AppointmentScreen = () => {
     const unsubscribe = bookingRef.onSnapshot(async doc => {
       if (doc.exists) {
         const bookingData = doc.data();
-        console.log(bookingData);
 
         try {
           // adding booking data to the orders collection
