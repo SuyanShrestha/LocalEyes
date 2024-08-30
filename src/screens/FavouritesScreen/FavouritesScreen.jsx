@@ -42,7 +42,6 @@ const FavouritesScreen = ({navigation}) => {
       docSnapshot => {
         if (docSnapshot.exists) {
           const data = docSnapshot.data();
-          // console.log(data);
           if (data) {
             setFavouritesIdArray(data.favourites || []);
           }
@@ -59,8 +58,6 @@ const FavouritesScreen = ({navigation}) => {
 
   // adding data of respective uid to favourites
   useEffect(() => {
-    // console.log(favouritesIdArray);
-
     if (favouritesIdArray.length === 0) {
       setFavourites([]); // Reset the favourites array if there are no favourites
       return;
@@ -96,7 +93,6 @@ const FavouritesScreen = ({navigation}) => {
       const matchesCategory = selectedCategory
         ? user.categoryID === selectedCategory.id
         : true;
-      // console.log(user);
       return matchesSearchTerm && matchesCategory;
     })
     .map(user => {
@@ -106,8 +102,6 @@ const FavouritesScreen = ({navigation}) => {
         categoryName: category ? category.name : 'Unknown', // Adding categoryName too to each user object alongside categoryID
       };
     });
-
-  // console.log(filteredFavorites);
 
   // Render each favorite user
   const renderUser = ({item}) => (
