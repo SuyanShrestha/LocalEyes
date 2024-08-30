@@ -92,23 +92,22 @@ In the initial version, LocalEyes will empower users to connect with local servi
 
 Below are some screenshots showcasing the features of the LocalEyes app:
 
-![Screenshot](src/assets/screenshots/1.jpg)
-![Screenshot](src/assets/screenshots/2.jpg)
-![Screenshot](src/assets/screenshots/3.jpg)
-![Screenshot](src/assets/screenshots/4.jpg)
-![Screenshot](src/assets/screenshots/5.jpg)
-![Screenshot](src/assets/screenshots/6.jpg)
-![Screenshot](src/assets/screenshots/7.jpg)
-![Screenshot](src/assets/screenshots/8.jpg)
-![Screenshot](src/assets/screenshots/9.jpg)
-![Screenshot](src/assets/screenshots/10.jpg)
-![Screenshot](src/assets/screenshots/11.jpg)
-![Screenshot](src/assets/screenshots/12.jpg)
-![Screenshot](src/assets/screenshots/13.jpg)
-![Screenshot](src/assets/screenshots/14.jpg)
-![Screenshot](src/assets/screenshots/15.jpg)
-![Screenshot](src/assets/screenshots/16.jpg)
-
+<img src="src/assets/screenshots/1.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/2.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/3.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/4.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/5.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/6.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/7.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/8.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/9.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/10.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/11.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/12.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/13.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/14.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/15.jpg" alt="Screenshot" width="300"/>
+<img src="src/assets/screenshots/16.jpg" alt="Screenshot" width="300"/>
 
 ### Contact
 Email: sh.suyan16@gmail.com
