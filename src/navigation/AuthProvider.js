@@ -17,8 +17,11 @@ export const AuthProvider = ({children}) => {
 
   const register = async (name, email, password) => {
     try {
-      const userCredential = await auth().createUserWithEmailAndPassword(email, password);
-      const { uid } = userCredential.user;
+      const userCredential = await auth().createUserWithEmailAndPassword(
+        email,
+        password,
+      );
+      const {uid} = userCredential.user;
 
       // Add the user to Firestore
       await firestore()
@@ -28,14 +31,13 @@ export const AuthProvider = ({children}) => {
           username: name,
           email: email,
           createdAt: firestore.Timestamp.fromDate(new Date()),
-          profilePic: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRooEnD32-UtBw55GBfDTxxUZApMhWWnRaoLw&s',
+          profilePic:
+            'https://firebasestorage.googleapis.com/v0/b/localeyes-4811b.appspot.com/o/mainlogo.jpg?alt=media&token=cc1d2f45-5ec5-486e-a16a-0053dbd31597',
           categoryID: '',
           totalRating: null,
           totalAgreements: null,
           phone: null,
         });
-
-      console.log('User added to Firestore with UID:', uid);
     } catch (error) {
       console.log('Something went wrong with sign up: ', error);
     }

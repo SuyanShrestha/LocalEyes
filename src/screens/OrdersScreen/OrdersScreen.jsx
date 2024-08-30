@@ -60,7 +60,6 @@ const OrdersScreen = () => {
 
   const openModal = order => {
     setSelectedOrder(order);
-    console.log(order);
     setModalVisible(true);
 
     // fetching provider's name based on providerID for modal
@@ -120,6 +119,12 @@ const OrdersScreen = () => {
           totalAgreements: newTotalAgreement,
         });
       });
+
+      setAlertMessage('Rating submitted successfully.');
+      setAlertVisible(true);
+      setTimeout(() => {
+        setAlertVisible(false);
+      }, 2000);
 
       handleDelete(selectedOrder.id);
     } catch (error) {
