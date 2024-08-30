@@ -60,7 +60,6 @@ const OrdersScreen = () => {
 
   const openModal = order => {
     setSelectedOrder(order);
-    console.log(order);
     setModalVisible(true);
 
     // fetching provider's name based on providerID for modal
